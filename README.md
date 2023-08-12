@@ -1,12 +1,11 @@
-# airbnb 클론 프로젝트 프론트엔드 파트
+# airvienna 클론 프로젝트 프론트엔드 파트
 
-- 전부 구현은 아니구, 부분 부분 하나씩 만들어갈 예정
-- 장기 프로젝트임.
-- 프로젝트 시작일 23-07-30
+- 장기 프로젝트
+- 프로젝트 시작일 23-08-12
 
 ## 개발 환경
 
-- React+TypeScript
+- React+TypeScript+Vite
 - HTML , CSS , JS
 
 ### CSS
