@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* 에어비엔비 변수 값 */
+  --page-shell-max-content-width: 2520px;
+  --explore_padding-inline: 40px;
+  --explore-nav_box-shadow-spread: 4px;
+
+  /* font */
+  --jx-zk-pv: 600;
+  --c-zdwk-p: 14px;
+
+  /* color 값 */
+  --ihf-tp-q: #ff385c;
+  --f-mkcy-f: #ffffff;
+  --j-qkgmf: #dddddd;
+  --fo-jk-r-s: #717171;
+  --e-swdx-p: 0 2px 4px rgba(0, 0, 0, 0.18);
+
+  --itr-yy-z: cubic-bezier(0.2, 0, 0, 1);
+}
