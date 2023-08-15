@@ -1,12 +1,26 @@
 import { Outlet } from 'react-router-dom';
-import './App.css';
 import Nav from './Nav/Nav';
+import Footer from './Nav/Footer';
+import { styled } from 'styled-components';
+
+const NavWrapper = styled.nav`
+  border-bottom: 1px solid #dddddd;
+`;
 
 function App() {
   return (
     <>
-      <Nav />
-      <Outlet />
+      <NavWrapper>
+        <Nav />
+      </NavWrapper>
+
+      <main>
+        <Outlet />
+      </main>
+
+      <footer>
+        <Footer />
+      </footer>
     </>
   );
 }
