@@ -5,9 +5,9 @@ import Switch from './svg/Switch';
 import Word from './svg/Word';
 import { FaBars, FaUserCircle } from 'react-icons/fa';
 
-const pdSizeSmall = '8px 24px 0 24px';
-const pdSizeMedium = '2.5rem';
-const pdSizeBig = '5rem';
+export const pdSizeSmall = '8px 24px 0 24px';
+export const pdSizeMedium = '2.5rem';
+export const pdSizeBig = '5rem';
 
 const NavWrapper = styled.div`
   padding-inline-start: ${pdSizeBig};
@@ -143,7 +143,7 @@ const Nav = () => {
 
       <SecondItemWrapper className="ml-5">
         <BigInput className="box-border flex justify-between items-center rounded-full px-5">
-          <div className="text-xl flex items-center">
+          <div className="text-xl flex items-center w-full cursor-pointer">
             <HiSearch />
             <div className="flex flex-col ml-2.5">
               <span className="text-sm font-semibold">어디든지</span>
@@ -151,7 +151,7 @@ const Nav = () => {
             </div>
           </div>
 
-          <SwitchWrapper className="text-xl h-9 w-9 rounded-3xl flex justify-center items-center">
+          <SwitchWrapper className="text-xl h-9 w-9 rounded-3xl flex justify-center items-center cursor-pointer">
             <Switch />
           </SwitchWrapper>
         </BigInput>
