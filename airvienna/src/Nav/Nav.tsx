@@ -1,182 +1,198 @@
-import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import MLogo from './MLogo';
-import LLogo from './LLogo';
-import Word from './Word';
+import MLogo from './svg/MLogo';
+import { HiSearch } from 'react-icons/hi';
+import Switch from './svg/Switch';
+import Word from './svg/Word';
 import { FaBars, FaUserCircle } from 'react-icons/fa';
 
-const Wrapper = styled.div`
-  display: block;
-  contain:strict
-  overflow-clip-margin: var(--explore-nav_box-shadow-spread);
-`;
-
-const Header = styled.header`
-  height: 80px;
-  width: 100%;
-  z-index: 100;
-  position: relative;
-`;
+const pdSizeSmall = '8px 24px 0 24px';
+const pdSizeMedium = '2.5rem';
+const pdSizeBig = '5rem';
 
 const NavWrapper = styled.div`
-  max-width: var(--page-shell-max-content-width, 1760px);
-  padding-inline-start: var(--explore_padding-inline);
-  padding-inline-end: var(--explore_padding-inline);
-  height: 100%;
-  position: relative;
-  width: 100%;
-  z-index: 1;
-  margin-inline: auto;
-  box-sizing: border-box;
+  padding-inline-start: ${pdSizeBig};
+  padding-inline-end: ${pdSizeBig};
+  @media screen and (max-width: 1440px) {
+    padding-inline-start: ${pdSizeMedium};
+    padding-inline-end: ${pdSizeMedium};
+  }
+  @media screen and (max-width: 743px) {
+    padding: ${pdSizeSmall};
+  }
 `;
 
-const NavFirst = styled.div`
-  flex: 1 0 140px;
-  box-sizing: border-box;
+const FirstItemWrapper = styled.div`
+  margin-right: 20px;
+  @media screen and (min-width: 950px) {
+    flex: 1 0 auto;
+  }
+  @media screen and (max-width: 743px) {
+    display: none;
+  }
 `;
 
-const LLogoWrapper = styled.div`
+const BLogoWrapper = styled.div`
+  color: var(--main-color);
   @media screen and (max-width: 1128px) {
     display: none;
   }
 `;
 
 const MLogoWrapper = styled.div`
+  color: var(--main-color);
   @media screen and (min-width: 1128px) {
     display: none;
   }
 `;
 
-const NavSecond = styled.div`
+const SecondItemWrapper = styled.div`
   flex: 0 1 auto;
-  min-width: 348px;
-  background-color: tomato;
-  padding: 0 24px;
-  box-sizing: border-box;
-`;
-
-const NavThird = styled.div`
-  flex: 1 0 140px;
-  box-sizing: border-box;
-  position: relative;
-  height: 80px;
-`;
-
-const NavThirdFirstDiv = styled.div`
-  margin-right: 8px;
-  a {
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    margin: 0;
-    padding: 12px;
-    div {
-      align-items: center;
-      display: flex;
-      height: 100%;
-      position: relative;
-      z-index: 1;
-      white-space: nowrap;
-      font-size: var(--c-zdwk-p);
-      font-weight: var(--jx-zk-pv);
-    }
-  }
-  button {
-    background: transparent;
-    border: 0;
-    cursor: pointer;
-    margin: 0;
-    padding: 12px;
-    div {
-      height: 100%;
-      position: relative;
-      z-index: 1;
-      div {
-        height: 18px;
-      }
-    }
+  width: 700px;
+  @media screen and (min-width: 950px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 `;
 
-const NavThirdSecondDiv = styled.div`
-  box-sizing: border-box;
+const BigInput = styled.div`
+  margin-left: -20px;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  width: calc(100%-48px);
+  min-height: 56px;
+  min-width: 285px;
+  @media screen and (min-width: 743px) {
+    display: none;
+  }
 `;
 
-const UserBtn = styled.button`
-  padding: 5px 5px 5px 12px;
-  background: transparent;
-  box-sizing: border-box;
-  cursor: pointer;
-  margin: 0;
-  background-color: var(--f-mkcy-f);
-  border: 1px solid var(--j-qkgmf);
-  border-radius: 21px;
-  transition: box-shadow 0.5s var(--itr-yy-z);
-  overflow: visible;
+const SwitchWrapper = styled.div`
+  border: 1px solid #dddddd;
+  margin-right: -0.5rem;
+`;
+
+const SmallInputWrapper = styled.div`
+  margin-left: -30px;
+  @media screen and (max-width: 743px) {
+    display: none;
+  }
+`;
+
+const SmallInput = styled.div`
+  height: 95%;
+  border: 1px solid #dddddd;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.05);
+  span {
+    background-color: #dddddd;
+  }
   &:hover {
-    box-shadow: var(--e-swdx-p);
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1);
+  }
+`;
+
+const SmallInputSearch = styled.div`
+  background-color: #ff385c;
+  color: white;
+`;
+
+const ThirdItemWrapper = styled.div`
+  flex: 1 0 auto;
+  @media screen and (min-width: 950px) {
+    flex: 1 0 140px;
+  }
+  @media screen and (max-width: 743px) {
+    display: none;
   }
   div:last-child {
-    margin-left: 12px;
-    color: var(--fo-jk-r-s);
-    flex: 0 0 30px;
-    height: 30px;
-    overflow: hidden;
-    position: relative;
-    width: 30px;
-    z-index: 1;
-    box-sizing: border-box;
+    height: 90%;
+    color: #717171;
+    border: 1px solid #dddddd;
+    &:hover {
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+    label {
+      margin-right: -7px;
+    }
+  }
+  div:nth-child(2) {
+    margin-left: -15px;
+    &:hover {
+      background-color: rgb(249 250 251);
+    }
+  }
+  div:first-child {
+    &:hover {
+      background-color: rgb(249 250 251);
+    }
   }
 `;
 
 const Nav = () => {
   return (
-    <Wrapper>
-      <Header>
-        <NavWrapper className="flex justify-between items-center">
-          <NavFirst>
-            <Link to="/">
-              <LLogoWrapper>
-                <LLogo />
-              </LLogoWrapper>
-              <MLogoWrapper>
-                <MLogo />
-              </MLogoWrapper>
-            </Link>
-          </NavFirst>
+    <NavWrapper className="h-20 w-full box-border flex items-center justify-between">
+      <FirstItemWrapper>
+        <BLogoWrapper className="flex justify-start items-center gap-1 text-2xl font-medium cursor-pointer">
+          <MLogo />
+          <span>airvienna</span>
+        </BLogoWrapper>
+        <MLogoWrapper className="cursor-pointer">
+          <MLogo />
+        </MLogoWrapper>
+      </FirstItemWrapper>
 
-          <NavSecond>2</NavSecond>
+      <SecondItemWrapper className="ml-5">
+        <BigInput className="box-border flex justify-between items-center rounded-full px-5">
+          <div className="text-xl flex items-center">
+            <HiSearch />
+            <div className="flex flex-col ml-2.5">
+              <span className="text-sm font-semibold">어디든지</span>
+              <span className="text-xs text-gray-400">언제든 일주일 • 게스트 추가</span>
+            </div>
+          </div>
 
-          <NavThird className="flex justify-end items-center">
-            <NavThirdFirstDiv className="flex justify-end">
-              <a href="/">
-                <div>당신의 공간을 에어비엔나하세요</div>
-              </a>
-              <button onClick={() => console.log('1')}>
-                <div className="flex items-center">
-                  <div className="flex items-center">
-                    <Word />
-                  </div>
-                </div>
-              </button>
-            </NavThirdFirstDiv>
-            <NavThirdSecondDiv>
-              <div className="inline relative">
-                <UserBtn className="flex items-center">
-                  <div>
-                    <FaBars className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <FaUserCircle className="w-7 h-7" />
-                  </div>
-                </UserBtn>
-              </div>
-            </NavThirdSecondDiv>
-          </NavThird>
-        </NavWrapper>
-      </Header>
-    </Wrapper>
+          <SwitchWrapper className="text-xl h-9 w-9 rounded-3xl flex justify-center items-center">
+            <Switch />
+          </SwitchWrapper>
+        </BigInput>
+
+        <SmallInputWrapper className="w-80 h-14 pt-1.5">
+          <SmallInput className="flex items-center justify-between text-sm px-2 max-w-full rounded-full">
+            <div className="font-semibold ml-4 cursor-pointer">어디든지</div>
+            <span className="h-6 w-px"></span>
+            <div className="font-semibold cursor-pointer">언제든 일주일</div>
+            <span className="h-6 w-px"></span>
+            <div className="text-gray-400 cursor-pointer">게스트 추가</div>
+            <SmallInputSearch className="flex justify-center items-center text-base font-semibold cursor-pointer w-8 h-8 rounded-full">
+              <HiSearch />
+            </SmallInputSearch>
+          </SmallInput>
+        </SmallInputWrapper>
+      </SecondItemWrapper>
+
+      <ThirdItemWrapper className="flex items-center justify-end max-w-lg ml-4 h-11 whitespace-nowrap	">
+        <div className="flex justify-center items-center h-full w-52 rounded-3xl cursor-pointer">
+          <span className="text-sm font-semibold">당신의 공간을 에어비엔나하세요</span>
+        </div>
+        <div className="flex justify-center items-center w-12 h-full rounded-3xl cursor-pointer">
+          <Word />
+        </div>
+        <div className="flex items-center justify-evenly h-full rounded-3xl cursor-pointer w-20">
+          <FaBars />
+          <label className="text-3xl">
+            <FaUserCircle />
+          </label>
+        </div>
+      </ThirdItemWrapper>
+    </NavWrapper>
   );
 };
 
 export default Nav;
+
+// const Wrapper = styled.div<BarSizeProps>`
+//   width: ${({ $widthSize }) => `${$widthSize}`};
+// `;
+// interface BarSizeProps {
+//   $widthSize: string;
+// }
