@@ -4,4 +4,10 @@
 
 :root {
   --main-color: #ff385c;
+  --nav-h: 5rem;
+
+  /* pd-size */
+  --p-small: 8px 24px 0 24px;
+  --p-medium: 2.5rem;
+  --p-big: 5rem;
 }
