@@ -5,7 +5,7 @@ import Switch from './svg/Switch';
 import Word from './svg/Word';
 import { FaBars, FaUserCircle } from 'react-icons/fa';
 import { useState } from 'react';
-import LoginModal from '../Components/Modals/LoginModal';
+import UserModal from '../Components/Modals/UserModal';
 
 const NavWrapper = styled.div`
   height: var(--nav-h);
@@ -129,13 +129,13 @@ const ThirdItemWrapper = styled.div`
 `;
 
 const Nav = () => {
-  const [isOpenLoginModal, setIsOpenLoginModal] = useState(false);
+  const [isOpenUser, setIsOpenUser] = useState(false);
 
-  const onLoginModal = () => {
-    setIsOpenLoginModal(true);
+  const openUserModal = () => {
+    setIsOpenUser(true);
   };
-  const offLoginModal = () => {
-    setIsOpenLoginModal(false);
+  const closeUserModal = () => {
+    setIsOpenUser(false);
   };
 
   return (
@@ -179,17 +179,17 @@ const Nav = () => {
         </SmallInputWrapper>
       </SecondItemWrapper>
 
-      <ThirdItemWrapper
-        onClick={onLoginModal}
-        className="flex items-center justify-end max-w-lg ml-4 h-11 whitespace-nowrap"
-      >
+      <ThirdItemWrapper className="flex items-center justify-end max-w-lg ml-4 h-11 whitespace-nowrap">
         <div className="flex justify-center items-center h-full w-52 rounded-3xl">
           <span className="text-sm font-semibold">당신의 공간을 에어비엔나하세요</span>
         </div>
         <div className="flex justify-center items-center w-12 h-full rounded-3xl">
           <Word />
         </div>
-        <div className="flex items-center justify-evenly h-full rounded-3xl w-20 cursor-pointer">
+        <div
+          onClick={openUserModal}
+          className="flex items-center justify-evenly h-full rounded-3xl w-20 cursor-pointer"
+        >
           <FaBars />
           <label className="text-3xl cursor-pointer">
             <FaUserCircle />
@@ -197,7 +197,7 @@ const Nav = () => {
         </div>
       </ThirdItemWrapper>
 
-      {isOpenLoginModal && <LoginModal onClose={offLoginModal} />}
+      {isOpenUser && <UserModal setIsOpen={setIsOpenUser} onClose={closeUserModal} />}
     </NavWrapper>
   );
 };
