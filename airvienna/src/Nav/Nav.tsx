@@ -4,20 +4,19 @@ import { HiSearch } from 'react-icons/hi';
 import Switch from './svg/Switch';
 import Word from './svg/Word';
 import { FaBars, FaUserCircle } from 'react-icons/fa';
-
-export const pdSizeSmall = '8px 24px 0 24px';
-export const pdSizeMedium = '2.5rem';
-export const pdSizeBig = '5rem';
+import { useState } from 'react';
+import LoginModal from '../Components/Modals/LoginModal';
 
 const NavWrapper = styled.div`
-  padding-inline-start: ${pdSizeBig};
-  padding-inline-end: ${pdSizeBig};
+  height: var(--nav-h);
+  padding-inline-start: var(--p-big);
+  padding-inline-end: var(--p-big);
   @media screen and (max-width: 1440px) {
-    padding-inline-start: ${pdSizeMedium};
-    padding-inline-end: ${pdSizeMedium};
+    padding-inline-start: var(--p-medium);
+    padding-inline-end: var(--p-medium);
   }
   @media screen and (max-width: 743px) {
-    padding: ${pdSizeSmall};
+    padding: var(--p-small);
   }
 `;
 
@@ -97,6 +96,7 @@ const SmallInputSearch = styled.div`
 `;
 
 const ThirdItemWrapper = styled.div`
+  position: relative;
   flex: 1 0 auto;
   @media screen and (min-width: 950px) {
     flex: 1 0 140px;
@@ -129,8 +129,17 @@ const ThirdItemWrapper = styled.div`
 `;
 
 const Nav = () => {
+  const [isOpenLoginModal, setIsOpenLoginModal] = useState(false);
+
+  const onLoginModal = () => {
+    setIsOpenLoginModal(true);
+  };
+  const offLoginModal = () => {
+    setIsOpenLoginModal(false);
+  };
+
   return (
-    <NavWrapper className="h-20 w-full box-border flex items-center justify-between">
+    <NavWrapper className="w-full box-border flex items-center justify-between">
       <FirstItemWrapper>
         <BLogoWrapper className="flex justify-start items-center gap-1 text-2xl font-medium cursor-pointer">
           <MLogo />
@@ -170,29 +179,27 @@ const Nav = () => {
         </SmallInputWrapper>
       </SecondItemWrapper>
 
-      <ThirdItemWrapper className="flex items-center justify-end max-w-lg ml-4 h-11 whitespace-nowrap	">
-        <div className="flex justify-center items-center h-full w-52 rounded-3xl cursor-pointer">
+      <ThirdItemWrapper
+        onClick={onLoginModal}
+        className="flex items-center justify-end max-w-lg ml-4 h-11 whitespace-nowrap"
+      >
+        <div className="flex justify-center items-center h-full w-52 rounded-3xl">
           <span className="text-sm font-semibold">당신의 공간을 에어비엔나하세요</span>
         </div>
-        <div className="flex justify-center items-center w-12 h-full rounded-3xl cursor-pointer">
+        <div className="flex justify-center items-center w-12 h-full rounded-3xl">
           <Word />
         </div>
-        <div className="flex items-center justify-evenly h-full rounded-3xl cursor-pointer w-20">
+        <div className="flex items-center justify-evenly h-full rounded-3xl w-20 cursor-pointer">
           <FaBars />
-          <label className="text-3xl">
+          <label className="text-3xl cursor-pointer">
             <FaUserCircle />
           </label>
         </div>
       </ThirdItemWrapper>
+
+      {isOpenLoginModal && <LoginModal onClose={offLoginModal} />}
     </NavWrapper>
   );
 };
 
 export default Nav;
-
-// const Wrapper = styled.div<BarSizeProps>`
-//   width: ${({ $widthSize }) => `${$widthSize}`};
-// `;
-// interface BarSizeProps {
-//   $widthSize: string;
-// }

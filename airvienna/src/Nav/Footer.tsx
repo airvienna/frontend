@@ -1,5 +1,4 @@
 import { styled } from 'styled-components';
-import { pdSizeBig, pdSizeMedium, pdSizeSmall } from './Nav';
 import Word from './svg/Word';
 import { AiOutlineUp } from 'react-icons/ai';
 import { HiOutlineSearch, HiOutlineHeart, HiOutlineUserCircle } from 'react-icons/hi';
@@ -7,14 +6,14 @@ import { HiOutlineSearch, HiOutlineHeart, HiOutlineUserCircle } from 'react-icon
 const borderTopStyle = { borderTop: '1px solid #dddddd' };
 
 const FooterWrapper = styled.div`
-  padding-inline-start: ${pdSizeBig};
-  padding-inline-end: ${pdSizeBig};
+  padding-inline-start: var(--p-big);
+  padding-inline-end: var(--p-big);
   @media screen and (max-width: 1440px) {
-    padding-inline-start: ${pdSizeMedium};
-    padding-inline-end: ${pdSizeMedium};
+    padding-inline-start: var(--p-medium);
+    padding-inline-end: var(--p-medium);
   }
   @media screen and (max-width: 743px) {
-    padding: ${pdSizeSmall};
+    padding: var(--p-small);
   }
   @media screen and (max-width: 1043px) {
     height: 6rem;
