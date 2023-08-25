@@ -2,177 +2,38 @@ import { styled } from 'styled-components';
 import { MdOutlineClose } from 'react-icons/md';
 import { SelectArrow } from '../Svgs/SelectArrow';
 import { useAnimate } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { HiOutlineMail } from 'react-icons/hi';
 import SnsLoginBtn from '../Oauth/SnsLoginBtn';
 import googleImage from '../Imgs/Google.png';
+import StyledInput from '../Input/StyledInput';
+import { WhiteBgOverlay } from '../Overlays/Overlays';
+import ErrorInform from '../general/ErrorInform';
+import { selectData } from '../SampleData/LoginSampleData';
+import { useSubmit } from 'react-router-dom';
 
-const pdSize = '20px';
-const wrapperWidth = '540px';
-const inputRadius = '7px';
+interface LoginModalProps {
+  isOpen: boolean;
+  onClose: (value: boolean) => void;
+}
 
-const LoginModalWrapper = styled.div`
-  z-index: 2;
-  width: ${wrapperWidth};
-  height: 580px;
-  position: fixed;
-  top: var(--nav-h);
-  left: 0;
-  right: 0;
-  margin: 0 auto;
-  transform: translateY(300px);
-`;
+interface LoginModalWrapperProps {
+  $isEmail: boolean;
+}
 
-const CloseMark = styled.div`
-  position: absolute;
-  left: ${pdSize};
-  &:hover {
-    background-color: rgb(249 250 251);
-    cursor: pointer;
-  }
-`;
-
-const HeaderHr = styled.div`
-  width: ${wrapperWidth};
-  height: 1px;
-  background-color: rgb(209 213 219);
-  margin-left: -${pdSize};
-  margin-top: ${pdSize};
-`;
-
-const SecondItemWrapper = styled.div`
-  padding-top: ${pdSize};
-  height: 300px;
-
-  button {
-    background-color: var(--main-color);
-  }
-`;
-
-// Todo : input 눌렀을 때 아래 hr없애기
-const InputWrapper = styled.div`
-  width: 100%;
-  height: 104px;
-  position: relative;
-  border: 1px solid gray;
-  border-radius: ${inputRadius};
-  background-color: white;
-`;
-
-const FirstSelect = styled.div`
-  border-bottom: 1px solid gray;
-  width: 100%;
-
-  span {
-    left: calc(${pdSize} / 2);
-    top: 5px;
-  }
-
-  select {
-    border-top-left-radius: ${inputRadius};
-    border-top-right-radius: ${inputRadius};
-    padding-top: 10px;
-    padding-left: calc(${pdSize} / 2);
-    outline: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-
-    &:focus {
-      border: 2px solid black;
-      outline: none;
-      border-radius: ${inputRadius};
-    }
-  }
-
-  div {
-    right: calc(${pdSize} / 2);
-    top: 16px;
-  }
-`;
-
-const SecondInputWrapper = styled.div`
-  div {
-    width: 14%;
-  }
-  &:focus-within {
-    border: 2px solid black;
-    border-radius: ${inputRadius};
-  }
-`;
-
-const SecondInput = styled.input`
-  border-bottom-left-radius: ${inputRadius};
-  border-bottom-right-radius: ${inputRadius};
-  width: 85%;
-  &:focus {
-    outline: none;
-  }
-`;
-
-const SecondTextWrapper = styled.div`
-  padding-left: calc(${pdSize} / 2);
-`;
-
-const PhoneNumber = styled.span`
-  transform: translateX(0) translateY(0) scale(1);
-`;
-
-const CountryNumber = styled.span`
-  display: none;
-`;
-
-const SecondInputOverlay = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-`;
-
-const MidHr = styled.div`
-  width: 45%;
-  height: 1px;
-  background-color: rgb(209 213 219);
-`;
-
-const SnsWrapper = styled.div``;
+interface InputWrapperProps {
+  $error?: boolean;
+}
 
 const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
   const [countryNum, setCountryNum] = useState('+82');
-
-  const [phoneNumWrapper, setPhoneNumWrapper] = useAnimate();
-  const [countryNumWrapper, setCountryNumWrapper] = useAnimate();
-
-  const [onInput, setOnInput] = useState(false);
-
-  const openInput = () => {
-    setOnInput(true);
+  const [onInputModal, setOnInputModal] = useState(false);
+  const openInputModal = () => {
+    setOnInputModal(true);
   };
-  const closeInput = () => {
-    setOnInput(false);
+  const closeInputModal = () => {
+    setOnInputModal(false);
   };
-
-  useEffect(() => {
-    if (!onInput) {
-      setPhoneNumWrapper(phoneNumWrapper.current, {
-        transform: 'translateX(0) translateY(0) scale(1)',
-      });
-      setCountryNumWrapper(countryNumWrapper.current, {
-        display: 'none',
-      });
-    } else if (onInput) {
-      setPhoneNumWrapper(phoneNumWrapper.current, {
-        transform: 'translateX(-15%) translateY(-10%) scale(0.8)',
-        marginBottom: '-5px',
-      });
-      setCountryNumWrapper(countryNumWrapper.current, {
-        display: 'block',
-      });
-    }
-  }, [onInput]);
 
   const [loginAnimate, setLoginAnimate] = useAnimate();
   useEffect(() => {
@@ -187,10 +48,61 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
     }
   }, [isOpen]);
 
+  const phoneInputRef = useRef<HTMLInputElement>(null);
+  const [phoneNumberErrorMessage, setPhoneNumberErrorMessage] = useState('');
+  const verifyPhoneNumber = () => {
+    if (phoneInputRef?.current?.value === '') {
+      setPhoneNumberErrorMessage('전화번호는 필수 항목입니다.');
+    } else if (
+      phoneInputRef?.current?.value &&
+      phoneInputRef?.current?.value?.length >= 1 &&
+      phoneInputRef?.current?.value?.length < 7
+    ) {
+      setPhoneNumberErrorMessage(
+        '전화번호가 너무 짧거나 유효하지 않은 문자를 포함합니다.'
+      );
+    } else setPhoneNumberErrorMessage('');
+    phoneInputRef?.current?.focus();
+  };
+
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{0,4}$/;
+  const [emailErrorMessage, setEmailErrorMessage] = useState('');
+  const verifyEmail = () => {
+    if (emailInputRef?.current?.value === '')
+      setEmailErrorMessage('이메일이 필요합니다.');
+    else if (!emailPattern.test(emailInputRef?.current?.value + ''))
+      setEmailErrorMessage('이메일을 입력하세요.');
+    else setEmailErrorMessage('');
+  };
+
+  const [loginWay, setLoginWay] = useState('phone');
+  const loginWayHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const { value } = e.currentTarget;
+    setLoginWay(value);
+  };
+
+  const submit = useSubmit();
+  const submitHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const { value } = event.currentTarget;
+
+    switch (value) {
+      case 'phone':
+        verifyPhoneNumber();
+
+      case '이메일':
+        verifyEmail();
+    }
+  };
   return (
     <>
       {isOpen && (
-        <LoginModalWrapper ref={loginAnimate} className="p-5 rounded-xl bg-white">
+        <LoginModalWrapper
+          $isEmail={loginWay == '이메일'}
+          ref={loginAnimate}
+          className="p-5 rounded-xl bg-white flex flex-col justify-between"
+        >
           <div className="flex items-center justify-center">
             <CloseMark
               onClick={() => onClose(false)}
@@ -203,53 +115,93 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
 
           <HeaderHr />
 
-          <SecondItemWrapper className="flex flex-col justify-around w-full">
+          <SecondItemWrapper
+            $isEmail={loginWay == '이메일'}
+            className="flex flex-col justify-between w-full"
+          >
             <span className="text-xl font-medium">
               에어비엔나에 오신 것을 환영합니다.
             </span>
 
-            <div className="flex flex-col ">
-              <InputWrapper>
-                <FirstSelect className="h-2/4 flex flex-col relative">
-                  <span className="text-xs absolute text-gray-400">국가/지역</span>
-                  <select
-                    defaultValue={'+82'}
-                    onChange={(e) => setCountryNum(e.target.value)}
-                    className="h-full text-slate-900"
-                  >
-                    {selectData.map(({ value, name }) => (
-                      <option key={value} value={value}>
-                        {name}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="absolute">
-                    <SelectArrow />
-                  </div>
-                </FirstSelect>
+            <div className="flex flex-col">
+              {loginWay == 'phone' && (
+                <TwoInputWrapper>
+                  <CountrySelectWrapper className="h-2/4 flex flex-col relative">
+                    <span className="text-xs absolute text-gray-400">국가/지역</span>
+                    <select
+                      defaultValue={'+82'}
+                      onChange={(e) => setCountryNum(e.target.value)}
+                      className="h-full text-slate-900"
+                    >
+                      {selectData.map(({ value, name }) => (
+                        <option key={value} value={value}>
+                          {name}
+                        </option>
+                      ))}
+                    </select>
+                    <div className="absolute">
+                      <SelectArrow />
+                    </div>
+                  </CountrySelectWrapper>
 
-                <SecondInputWrapper
-                  onClick={openInput}
-                  className="flex h-2/4 items-center relative"
-                >
-                  <SecondTextWrapper className="flex flex-col justify-center items-start text-gray-500 font-medium">
-                    <PhoneNumber ref={phoneNumWrapper}>전화번호</PhoneNumber>
-                    <CountryNumber ref={countryNumWrapper} className="text-base">
-                      {countryNum}
-                    </CountryNumber>
-                  </SecondTextWrapper>
-                  <SecondInput id="전화번호" className="h-full" />
-                </SecondInputWrapper>
-              </InputWrapper>
+                  <InputWrapper $error={phoneNumberErrorMessage !== ''}>
+                    <StyledInput
+                      error={phoneNumberErrorMessage !== ''}
+                      InputRef={phoneInputRef}
+                      inputType="number"
+                      btext="전화번호"
+                      countryNum={countryNum}
+                      onModal={onInputModal}
+                      openModal={openInputModal}
+                      onKeyDown={() => setPhoneNumberErrorMessage('')}
+                    />
+                  </InputWrapper>
+                </TwoInputWrapper>
+              )}
+
+              {loginWay == '이메일' && (
+                <InputWrapper $error={emailErrorMessage !== ''}>
+                  <StyledInput
+                    onKeyDown={verifyEmail}
+                    inputType="email"
+                    onModal={onInputModal}
+                    openModal={openInputModal}
+                    InputRef={emailInputRef}
+                    btext="이메일"
+                    isSamebtext={true}
+                    error={emailErrorMessage !== ''}
+                  />
+                </InputWrapper>
+              )}
             </div>
 
-            <span style={{ marginTop: '-10px' }} className="text-xs text-gray-800">
-              전화나 문자로 전화번호를 확인하겠습니다. 일반 문자 메시지 요금 및 데이터
-              요금이 부과됩니다.
-              <span className="underline font-medium">개인정보 처리방침</span>
-            </span>
+            {loginWay == 'phone' && (
+              <>
+                {phoneNumberErrorMessage ? (
+                  <ErrorInformWrapper>
+                    <ErrorInform message={phoneNumberErrorMessage} />
+                  </ErrorInformWrapper>
+                ) : (
+                  <span style={{ marginTop: '-10px' }} className="text-xs text-gray-800">
+                    전화나 문자로 전화번호를 확인하겠습니다. 일반 문자 메시지 요금 및
+                    데이터 요금이 부과됩니다.
+                    <span className="underline font-medium">개인정보 처리방침</span>
+                  </span>
+                )}
+              </>
+            )}
 
-            <button className="w-full h-11 rounded-md text-white text-sm">계속</button>
+            {loginWay == '이메일' && (
+              <>{emailErrorMessage && <ErrorInform message={emailErrorMessage} />}</>
+            )}
+
+            <button
+              value={loginWay}
+              onClick={submitHandler}
+              className="w-full h-11 rounded-md text-white text-sm"
+            >
+              계속
+            </button>
           </SecondItemWrapper>
 
           <div className="flex items-center justify-between w-full mt-3">
@@ -258,16 +210,16 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
             <MidHr />
           </div>
 
-          <SnsWrapper className="flex flex-col items-center justify-evenly py-3.5">
-            <SnsLoginBtn snsName="이메일">
+          <div className="flex flex-col items-center justify-evenly py-3.5 max-h-60">
+            <SnsLoginBtn snsName="이메일" onClick={loginWayHandler}>
               <HiOutlineMail />
             </SnsLoginBtn>
-            <SnsLoginBtn snsName="구글">
+            <SnsLoginBtn snsName="구글" onClick={loginWayHandler}>
               <img src={googleImage} />
             </SnsLoginBtn>
-          </SnsWrapper>
+          </div>
 
-          {onInput && <SecondInputOverlay onClick={closeInput} />}
+          {onInputModal && <WhiteBgOverlay onClose={closeInputModal} />}
         </LoginModalWrapper>
       )}
     </>
@@ -276,35 +228,100 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
 
 export default LoginModal;
 
-const selectData: selectDataProps[] = [
-  {
-    value: '+358',
-    name: '핀란드 (+358)',
-  },
-  {
-    value: '+63',
-    name: '필리핀 (+63)',
-  },
-  {
-    value: '+64',
-    name: '핏케언 섬 (+64)',
-  },
-  {
-    value: '+82',
-    name: '한국 (+82)',
-  },
-  {
-    value: '+36',
-    name: '헝가리 (+36)',
-  },
-];
+const LoginModalWrapper = styled.div<LoginModalWrapperProps>`
+  z-index: 2;
+  width: var(--wrapper-width);
+  height: ${({ $isEmail }) => ($isEmail ? '480px' : '580px')};
 
-interface selectDataProps {
-  value: string;
-  name: string;
-}
+  position: fixed;
+  top: var(--nav-h);
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  transform: translateY(300px);
+`;
 
-interface LoginModalProps {
-  isOpen: boolean;
-  onClose: (value: boolean) => void;
-}
+const ErrorInformWrapper = styled.div`
+  margin-top: -25px;
+`;
+
+const CloseMark = styled.div`
+  position: absolute;
+  left: var(--signup-pdsize);
+  &:hover {
+    background-color: rgb(249 250 251);
+    cursor: pointer;
+  }
+`;
+
+const HeaderHr = styled.div`
+  width: var(--wrapper-width);
+  height: 1px;
+  background-color: rgb(209 213 219);
+  margin-left: calc(var(--signup-pdsize) * -1);
+  margin-top: var(--signup-pdsize);
+`;
+
+const SecondItemWrapper = styled.form<LoginModalWrapperProps>`
+  padding-top: var(--signup-pdsize);
+  height: ${({ $isEmail }) => ($isEmail ? '180px' : '300px')};
+
+  button {
+    background-color: var(--main-color);
+    z-index: 1;
+  }
+`;
+
+const CountrySelectWrapper = styled.div`
+  border-bottom: 1px solid gray;
+  width: 100%;
+
+  span {
+    left: calc(var(--signup-pdsize) / 2);
+    top: 5px;
+  }
+
+  select {
+    border-top-left-radius: var(--input-radius);
+    border-top-right-radius: var(--input-radius);
+    padding-top: 10px;
+    padding-left: calc(var(--signup-pdsize) / 2);
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    &:focus {
+      border: 2px solid black;
+      outline: none;
+      border-radius: var(--input-radius);
+    }
+  }
+
+  div {
+    right: calc(var(--signup-pdsize) / 2);
+    top: 16px;
+  }
+`;
+
+const MidHr = styled.div`
+  width: 45%;
+  height: 1px;
+  background-color: rgb(209 213 219);
+`;
+
+const InputWrapper = styled.div<InputWrapperProps>`
+  width: 100%;
+  height: 52px;
+
+  border-radius: var(--input-radius);
+  border: ${({ $error }) => ($error ? '1px solid var(--error-color)' : '1px solid gray')};
+`;
+
+const TwoInputWrapper = styled.div`
+  width: 100%;
+  height: 104px;
+
+  border: 1px solid gray;
+  border-radius: var(--input-radius);
+`;

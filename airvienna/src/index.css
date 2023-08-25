@@ -4,10 +4,24 @@
 
 :root {
   --main-color: #ff385c;
+  --error-color: #c13515;
+  --input-text-color: rgb(107 114 128);
+  --input-text-color-write: black;
+
   --nav-h: 5rem;
 
   /* pd-size */
   --p-small: 8px 24px 0 24px;
   --p-medium: 2.5rem;
   --p-big: 5rem;
+
+  --signup-pdsize: 20px;
+  --wrapper-width: 540px;
+  --input-radius: 7px;
+}
+
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

@@ -1,7 +1,7 @@
 import { styled } from 'styled-components';
 import { PropsWithChildren } from 'react';
 
-const Wrapper = styled.div`
+const Wrapper = styled.button`
   border: 1px solid black;
   border-radius: 8px;
 
@@ -20,11 +20,20 @@ const Icon = styled.div`
 
 interface SnsLoginProps {
   snsName: string;
+  onClick: (event: any) => void;
 }
 
-const SnsLoginBtn = ({ children, snsName }: PropsWithChildren<SnsLoginProps>) => {
+const SnsLoginBtn = ({
+  children,
+  snsName,
+  onClick,
+}: PropsWithChildren<SnsLoginProps>) => {
   return (
-    <Wrapper className="my-3 bg-white w-full h-12 px-2 flex box-border justify-center items-center relative box-border p-px">
+    <Wrapper
+      onClick={(e) => onClick(e)}
+      value={snsName}
+      className="my-3 bg-white w-full h-12 px-2 flex box-border justify-center items-center relative box-border p-px"
+    >
       <Icon className="absolute text-xl flex justify-center items-center">
         {children}
       </Icon>
