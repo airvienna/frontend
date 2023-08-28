@@ -1,21 +1,27 @@
 import { useAnimate } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { Children, PropsWithChildren, useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 
 interface StyledInputProps {
   error: boolean;
   inputType: string;
   InputRef: React.ForwardedRef<HTMLInputElement> | any;
+  onModal: boolean;
 
+  max?: any;
+  min?: any;
+
+  defaultValue?: string;
   isSamebtext?: boolean;
   btext?: string;
-  stext?: string;
   countryNum?: string;
-  onModal?: boolean;
+
+  onChange?: () => void;
   openModal?: () => void;
   onFocus?: () => void;
   onBlur?: any;
   onKeyDown?: () => void;
+  onInput?: () => void;
 }
 
 interface isSamebtextStyledProps {
@@ -26,6 +32,7 @@ interface isSamebtextStyledProps {
 }
 
 const StyledInput = ({
+  children,
   error,
   isSamebtext,
   btext,
@@ -33,10 +40,14 @@ const StyledInput = ({
   onModal,
   openModal,
   InputRef,
-  onFocus,
   onKeyDown,
+  onChange,
+  onInput,
   inputType,
-}: StyledInputProps) => {
+  defaultValue,
+  max,
+  min,
+}: PropsWithChildren<StyledInputProps>) => {
   const [bigText, setBigText] = useAnimate();
   const [smallText, setSmallText] = useAnimate();
 
@@ -48,7 +59,7 @@ const StyledInput = ({
       setSmallText(smallText.current, {
         display: 'none',
       });
-    } else if (onModal) {
+    } else if (onModal || defaultValue) {
       setBigText(bigText.current, {
         transform: 'translateX(-10%) translateY(-4%) scale(0.8)',
       });
@@ -84,15 +95,21 @@ const StyledInput = ({
           ref={smallText}
           className="flex justify-start items-center font-normal text-md h-full"
         >
-          {!isSamebtext && <div>{countryNum}</div>}
+          {!isSamebtext && countryNum && <div>{countryNum}</div>}
           <Input
+            max={max && max}
+            min={min && min}
             $onBlur={onBlur}
             onBlur={() => setOnBlur(error)}
+            onChange={onChange}
             onKeyDown={onKeyDown}
+            onInput={onInput}
             type={inputType}
             placeholder={isSamebtext ? btext : ''}
             ref={InputRef}
+            defaultValue={defaultValue ? defaultValue : ''}
           />
+          <ChildrenWrapper>{children}</ChildrenWrapper>
         </SmallTextWrapper>
       </Wrapper>
     </>
@@ -100,6 +117,15 @@ const StyledInput = ({
 };
 
 export default StyledInput;
+
+const ChildrenWrapper = styled.span`
+  position: absolute;
+  right: 30px;
+  z-index: 3;
+  font-size: 12px;
+  text-decoration: underline;
+  margin-bottom: 20px;
+`;
 
 const Wrapper = styled.div<isSamebtextStyledProps>`
   width: 100%;
@@ -118,8 +144,8 @@ const Wrapper = styled.div<isSamebtextStyledProps>`
 `;
 
 const Input = styled.input<isSamebtextStyledProps>`
-  width: 100%;
-  height: 95%;
+  width: 98%;
+  height: 85%;
   z-index: 1;
 
   border-bottom-right-radius: var(--input-radius);

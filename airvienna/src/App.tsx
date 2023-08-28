@@ -14,13 +14,9 @@ function App() {
         <Nav />
       </NavWrapper>
 
-      <main>
-        <Outlet />
-      </main>
+      <Outlet />
 
-      <footer>
-        <Footer />
-      </footer>
+      <Footer />
     </>
   );
 }

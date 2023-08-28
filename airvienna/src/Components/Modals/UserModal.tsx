@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { useState } from 'react';
 import LoginModal from './LoginModal';
 import { BlackBgOverlay, WhiteBgOverlay } from '../Overlays/Overlays';
+import EmailSignupModal from './EmailSignupModal';
 
 const UserModalWrapper = styled.div`
   box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.01), -1px -1px 15px rgba(0, 0, 0, 0.1);
@@ -50,6 +51,7 @@ const UserModalWrapper = styled.div`
 
 const UserModal = ({ onClose, setIsOpen }: userModalProps) => {
   const [isLoginopen, setIsLoginopen] = useState(false);
+  const [verifiedEmail, setVerifiedEmail] = useState(false);
 
   const openLoginModal = () => {
     setIsLoginopen(true);
@@ -78,10 +80,16 @@ const UserModal = ({ onClose, setIsOpen }: userModalProps) => {
       )}
       {isLoginopen && (
         <>
-          <LoginModal isOpen={isLoginopen} onClose={closeLoginModal} />
+          <LoginModal
+            isOpen={isLoginopen}
+            onClose={closeLoginModal}
+            setVerifiedEmail={setVerifiedEmail}
+          />
           <BlackBgOverlay onClose={closeLoginModal} />
         </>
       )}
+
+      {verifiedEmail && <EmailSignupModal onClose={closeLoginModal}></EmailSignupModal>}
     </>
   );
 };

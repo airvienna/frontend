@@ -1,6 +1,6 @@
 import { styled } from 'styled-components';
 
-const MainWrapper = styled.div`
+const HomeWrapper = styled.div`
   height: calc(100vh - 10rem);
   @media screen and (max-width: 1043px) {
     height: calc(100vh - 11rem);
@@ -11,8 +11,8 @@ const MainWrapper = styled.div`
   width: 100%;
 `;
 
-const Main = () => {
-  return <MainWrapper></MainWrapper>;
+const Home = () => {
+  return <HomeWrapper>This is Home</HomeWrapper>;
 };
 
-export default Main;
+export default Home;

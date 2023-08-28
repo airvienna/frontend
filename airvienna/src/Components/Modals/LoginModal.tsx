@@ -1,5 +1,4 @@
 import { styled } from 'styled-components';
-import { MdOutlineClose } from 'react-icons/md';
 import { SelectArrow } from '../Svgs/SelectArrow';
 import { useAnimate } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
@@ -10,11 +9,16 @@ import StyledInput from '../Input/StyledInput';
 import { WhiteBgOverlay } from '../Overlays/Overlays';
 import ErrorInform from '../general/ErrorInform';
 import { selectData } from '../SampleData/LoginSampleData';
-import { useSubmit } from 'react-router-dom';
+import { useNavigation } from 'react-router-dom';
+import LoginButton from '../general/LoginButton';
+import ModalHeader from './ModalHeader';
+import { emailAtom } from '../../atom/emailAtoms';
+import { useRecoilState } from 'recoil';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: (value: boolean) => void;
+  setVerifiedEmail: (value: boolean) => void;
 }
 
 interface LoginModalWrapperProps {
@@ -25,7 +29,9 @@ interface InputWrapperProps {
   $error?: boolean;
 }
 
-const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
+const LoginModal = ({ isOpen, onClose, setVerifiedEmail }: LoginModalProps) => {
+  const [nowEmail, setNowEmail] = useRecoilState(emailAtom);
+
   const [countryNum, setCountryNum] = useState('+82');
   const [onInputModal, setOnInputModal] = useState(false);
   const openInputModal = () => {
@@ -73,7 +79,9 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
       setEmailErrorMessage('이메일이 필요합니다.');
     else if (!emailPattern.test(emailInputRef?.current?.value + ''))
       setEmailErrorMessage('이메일을 입력하세요.');
-    else setEmailErrorMessage('');
+    else {
+      setEmailErrorMessage('');
+    }
   };
 
   const [loginWay, setLoginWay] = useState('phone');
@@ -82,19 +90,27 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
     setLoginWay(value);
   };
 
-  const submit = useSubmit();
+  const navigation = useNavigation();
+  const isLoading = navigation.state === 'submitting';
+
   const submitHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const { value } = event.currentTarget;
-
     switch (value) {
       case 'phone':
         verifyPhoneNumber();
+        break;
 
       case '이메일':
         verifyEmail();
+        if (emailErrorMessage === '') {
+          setNowEmail(emailInputRef?.current?.value + '');
+          setVerifiedEmail(true);
+        }
+        break;
     }
   };
+
   return (
     <>
       {isOpen && (
@@ -103,18 +119,7 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
           ref={loginAnimate}
           className="p-5 rounded-xl bg-white flex flex-col justify-between"
         >
-          <div className="flex items-center justify-center">
-            <CloseMark
-              onClick={() => onClose(false)}
-              className="flex justify-center items-center rounded-full w-7 h-7"
-            >
-              <MdOutlineClose />
-            </CloseMark>
-            <span className="text-sm font-medium">로그인 또는 회원가입</span>
-          </div>
-
-          <HeaderHr />
-
+          <ModalHeader onClick={() => onClose(false)}>로그인 또는 회원가입</ModalHeader>
           <SecondItemWrapper
             $isEmail={loginWay == '이메일'}
             className="flex flex-col justify-between w-full"
@@ -195,13 +200,9 @@ const LoginModal = ({ isOpen, onClose }: LoginModalProps) => {
               <>{emailErrorMessage && <ErrorInform message={emailErrorMessage} />}</>
             )}
 
-            <button
-              value={loginWay}
-              onClick={submitHandler}
-              className="w-full h-11 rounded-md text-white text-sm"
-            >
+            <LoginButton isLoading={isLoading} value={loginWay} onClick={submitHandler}>
               계속
-            </button>
+            </LoginButton>
           </SecondItemWrapper>
 
           <div className="flex items-center justify-between w-full mt-3">
@@ -230,7 +231,7 @@ export default LoginModal;
 
 const LoginModalWrapper = styled.div<LoginModalWrapperProps>`
   z-index: 2;
-  width: var(--wrapper-width);
+  width: var(--modal-wrapper-width);
   height: ${({ $isEmail }) => ($isEmail ? '480px' : '580px')};
 
   position: fixed;
@@ -245,31 +246,9 @@ const ErrorInformWrapper = styled.div`
   margin-top: -25px;
 `;
 
-const CloseMark = styled.div`
-  position: absolute;
-  left: var(--signup-pdsize);
-  &:hover {
-    background-color: rgb(249 250 251);
-    cursor: pointer;
-  }
-`;
-
-const HeaderHr = styled.div`
-  width: var(--wrapper-width);
-  height: 1px;
-  background-color: rgb(209 213 219);
-  margin-left: calc(var(--signup-pdsize) * -1);
-  margin-top: var(--signup-pdsize);
-`;
-
 const SecondItemWrapper = styled.form<LoginModalWrapperProps>`
   padding-top: var(--signup-pdsize);
   height: ${({ $isEmail }) => ($isEmail ? '180px' : '300px')};
-
-  button {
-    background-color: var(--main-color);
-    z-index: 1;
-  }
 `;
 
 const CountrySelectWrapper = styled.div`
@@ -310,15 +289,16 @@ const MidHr = styled.div`
   background-color: rgb(209 213 219);
 `;
 
-const InputWrapper = styled.div<InputWrapperProps>`
+export const InputWrapper = styled.div<InputWrapperProps>`
   width: 100%;
   height: 52px;
+  min-height: 52px;
 
   border-radius: var(--input-radius);
   border: ${({ $error }) => ($error ? '1px solid var(--error-color)' : '1px solid gray')};
 `;
 
-const TwoInputWrapper = styled.div`
+export const TwoInputWrapper = styled.div`
   width: 100%;
   height: 104px;
 
