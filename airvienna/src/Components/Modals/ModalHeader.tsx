@@ -8,7 +8,7 @@ interface ModalHeaderProps {
 
 const ModalHeader = ({ onClick, children }: PropsWithChildren<ModalHeaderProps>) => {
   return (
-    <>
+    <ModalHeaderWrapper>
       <div className="flex items-center justify-center">
         <CloseMark
           onClick={onClick}
@@ -19,11 +19,15 @@ const ModalHeader = ({ onClick, children }: PropsWithChildren<ModalHeaderProps>)
         <span className="text-base font-semibold">{children}</span>
       </div>
       <HeaderHr />
-    </>
+    </ModalHeaderWrapper>
   );
 };
 
 export default ModalHeader;
+
+const ModalHeaderWrapper = styled.div`
+  height: 30px;
+`;
 
 const CloseMark = styled.div`
   position: absolute;

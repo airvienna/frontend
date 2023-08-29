@@ -5,6 +5,58 @@ import LoginModal from './LoginModal';
 import { BlackBgOverlay, WhiteBgOverlay } from '../Overlays/Overlays';
 import EmailSignupModal from './EmailSignupModal';
 
+const UserModal = ({ onClose, setIsOpen }: userModalProps) => {
+  const [isLoginopen, setIsLoginopen] = useState(false);
+  const [verifiedEmail, setVerifiedEmail] = useState(false);
+
+  const openLoginModal = () => {
+    setIsLoginopen(true);
+  };
+  const closeLoginModal = () => {
+    setIsLoginopen(false);
+    setIsOpen(false);
+  };
+
+  return (
+    <>
+      {!isLoginopen && (
+        <>
+          <UserModalWrapper className="rounded-xl flex flex-col justify-around items-between box-border p-3 text-sm w-60 h-52 border-2 border-gray-50 bg-white">
+            <div onClick={openLoginModal}>로그인</div>
+            <div onClick={openLoginModal}>회원 가입</div>
+            <hr className="w-60" />
+            <div>당신의 공간을 에어비엔나하세요</div>
+            <div>도움말 센터</div>
+          </UserModalWrapper>
+          {createPortal(
+            <WhiteBgOverlay onClose={onClose} />,
+            document.body as HTMLElement
+          )}
+        </>
+      )}
+      {isLoginopen && (
+        <>
+          <LoginModal
+            isOpen={isLoginopen}
+            onClose={closeLoginModal}
+            setVerifiedEmail={setVerifiedEmail}
+          />
+          <BlackBgOverlay onClose={closeLoginModal} />
+        </>
+      )}
+
+      {verifiedEmail && <EmailSignupModal onClose={closeLoginModal} />}
+    </>
+  );
+};
+
+export default UserModal;
+
+interface userModalProps {
+  onClose: () => void;
+  setIsOpen: (value: boolean) => void;
+}
+
 const UserModalWrapper = styled.div`
   box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.01), -1px -1px 15px rgba(0, 0, 0, 0.1);
   z-index: 2;
@@ -48,55 +100,3 @@ const UserModalWrapper = styled.div`
     }
   }
 `;
-
-const UserModal = ({ onClose, setIsOpen }: userModalProps) => {
-  const [isLoginopen, setIsLoginopen] = useState(false);
-  const [verifiedEmail, setVerifiedEmail] = useState(false);
-
-  const openLoginModal = () => {
-    setIsLoginopen(true);
-  };
-  const closeLoginModal = () => {
-    setIsLoginopen(false);
-    setIsOpen(false);
-  };
-
-  return (
-    <>
-      {!isLoginopen && (
-        <>
-          <UserModalWrapper className="rounded-xl flex flex-col justify-around items-between box-border p-3 text-sm w-60 h-52 border-2 border-gray-50 bg-white">
-            <div onClick={openLoginModal}>로그인</div>
-            <div onClick={openLoginModal}>회원 가입</div>
-            <hr className="w-60" />
-            <div>당신의 공간을 에어비엔나하세요</div>
-            <div>도움말 센터</div>
-          </UserModalWrapper>
-          {createPortal(
-            <WhiteBgOverlay onClose={onClose} />,
-            document.body as HTMLElement
-          )}
-        </>
-      )}
-      {isLoginopen && (
-        <>
-          <LoginModal
-            isOpen={isLoginopen}
-            onClose={closeLoginModal}
-            setVerifiedEmail={setVerifiedEmail}
-          />
-          <BlackBgOverlay onClose={closeLoginModal} />
-        </>
-      )}
-
-      {verifiedEmail && <EmailSignupModal onClose={closeLoginModal}></EmailSignupModal>}
-    </>
-  );
-};
-
-export default UserModal;
-
-interface userModalProps {
-  onClose: () => void;
-  setIsOpen: (value: boolean) => void;
-}

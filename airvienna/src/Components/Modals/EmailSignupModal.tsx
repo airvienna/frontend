@@ -4,7 +4,7 @@ import { InputWrapper, TwoInputWrapper } from './LoginModal';
 import StyledInput from '../Input/StyledInput';
 import { useEffect, useRef, useState } from 'react';
 import { WhiteBgOverlay } from '../Overlays/Overlays';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { emailAtom } from '../../atom/emailAtoms';
 import PasswordCheck from '../general/PasswordCheck';
 import PasswordInform from '../general/PasswordInform';
@@ -18,6 +18,7 @@ import {
   useSubmit,
 } from 'react-router-dom';
 import axios from 'axios';
+import { isLoginAtom, userNameAtom } from '../../atom/isloginAtom';
 
 // 시간 나면 검증부분 전부 커스텀 훅으로 리팩토링 하기.
 
@@ -40,11 +41,15 @@ interface ActionDataType {
 
 const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
   const navigation = useNavigation();
+  const isSubmitting = navigation.state == 'submitting';
+
   const navigate = useNavigate();
   const actionData = useActionData() as ActionDataType;
   const submit = useSubmit();
 
   const [nowEmail, setNowEmail] = useRecoilState(emailAtom);
+  const [islogin, setIslogin] = useRecoilState(isLoginAtom);
+  const setUsername = useSetRecoilState(userNameAtom);
 
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
@@ -56,7 +61,9 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
 
   useEffect(() => {
     if (actionData?.verified) {
-      console.log(actionData?.response);
+      setUsername(firstNameRef?.current?.value.substr(0, 1) + '');
+      onClose();
+      setIslogin(true);
     } else if (!actionData?.verified) {
       console.log('실패');
     }
@@ -232,7 +239,7 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
     <>
       <EmailSignupModalWrapper
         onSubmit={onSubmit}
-        className="p-5 rounded-xl flex flex-col overflow-auto"
+        className="p-5 rounded-xl flex flex-col overflow-scroll"
       >
         <ModalHeader onClick={onClose}>회원 가입 완료하기</ModalHeader>
 
@@ -335,7 +342,7 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
               onChange={verifyPassword}
             >
               <span onClick={handleShowPw} className="cursor-pointer">
-                표시
+                {showPw ? '숨기기' : '표시'}
               </span>
             </StyledInput>
           </InputWrapper>
@@ -450,7 +457,9 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
         </Margin20>
 
         <Margin30>
-          <LoginButton type={'submit'}>동의 및 계속하기</LoginButton>
+          <LoginButton isLoading={isSubmitting} type={'submit'}>
+            동의 및 계속하기
+          </LoginButton>
         </Margin30>
 
         {onFirstName && <WhiteBgOverlay onClose={closeFirstName} />}
@@ -466,6 +475,7 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
 export default EmailSignupModal;
 
 const EmailSignupModalWrapper = styled.form`
+  box-sizing: border-box;
   height: 880px;
   width: var(--modal-wrapper-width);
 
@@ -474,6 +484,7 @@ const EmailSignupModalWrapper = styled.form`
   z-index: 2;
 
   top: calc(var(--nav-h) / 2);
+
   left: 0;
   right: 0;
   margin: 0 auto;
@@ -541,7 +552,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       data: { lastName, firstName, birth, email, password },
     });
 
-    return { verified: true, response };
+    if (response.status == 200) return { verified: true, response };
+    else return { verified: false };
   } catch {
     return { verified: false };
   }

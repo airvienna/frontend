@@ -6,6 +6,123 @@ import Word from './svg/Word';
 import { FaBars, FaUserCircle } from 'react-icons/fa';
 import { useState } from 'react';
 import UserModal from '../Components/Modals/UserModal';
+import { useRecoilValue } from 'recoil';
+import { isAntiAtom, isLoginAtom, userNameAtom } from '../atom/isloginAtom';
+import AntiDiscriminationModal from '../Components/Modals/AntiDiscriminationModal';
+import { BlackBgOverlay } from '../Components/Overlays/Overlays';
+import AddProfileModal from '../Components/Modals/AddProfileModal';
+
+const Nav = () => {
+  const [isOpenUser, setIsOpenUser] = useState(false);
+
+  const openUserModal = () => {
+    setIsOpenUser(true);
+  };
+  const closeUserModal = () => {
+    setIsOpenUser(false);
+  };
+
+  const [antiOverlay, setAntiOverlay] = useState(false);
+
+  const closeAntiModal = () => {
+    setAntiOverlay(false);
+  };
+
+  const isLogin = useRecoilValue(isLoginAtom);
+  const isAnti = useRecoilValue(isAntiAtom);
+  const userName = useRecoilValue(userNameAtom);
+
+  // 프로필 생성하기 임시
+  const [onOpen, setOnOpen] = useState(false);
+
+  return (
+    <>
+      <NavWrapper className="w-full box-border flex items-center justify-between">
+        <FirstItemWrapper>
+          <BLogoWrapper className="flex justify-start items-center gap-1 text-2xl font-medium cursor-pointer">
+            <MLogo />
+            <span>airvienna</span>
+          </BLogoWrapper>
+          <MLogoWrapper className="cursor-pointer">
+            <MLogo />
+          </MLogoWrapper>
+        </FirstItemWrapper>
+
+        <SecondItemWrapper className="ml-5">
+          <BigInput className="box-border flex justify-between items-center rounded-full px-5">
+            <div className="text-xl flex items-center w-full cursor-pointer">
+              <HiSearch />
+              <div className="flex flex-col ml-2.5">
+                <span className="text-sm font-semibold">어디든지</span>
+                <span className="text-xs text-gray-400">언제든 일주일 • 게스트 추가</span>
+              </div>
+            </div>
+
+            <SwitchWrapper className="text-xl h-9 w-9 rounded-3xl flex justify-center items-center cursor-pointer">
+              <Switch />
+            </SwitchWrapper>
+          </BigInput>
+
+          <SmallInputWrapper className="w-80 h-14 pt-1.5">
+            <SmallInput className="flex items-center justify-between text-sm px-2 max-w-full rounded-full">
+              <div className="font-semibold ml-4 cursor-pointer">어디든지</div>
+              <span className="h-6 w-px"></span>
+              <div className="font-semibold cursor-pointer">언제든 일주일</div>
+              <span className="h-6 w-px"></span>
+              <div className="text-gray-400 cursor-pointer">게스트 추가</div>
+              <SmallInputSearch className="flex justify-center items-center text-base font-semibold cursor-pointer w-8 h-8 rounded-full">
+                <HiSearch />
+              </SmallInputSearch>
+            </SmallInput>
+          </SmallInputWrapper>
+        </SecondItemWrapper>
+
+        <ThirdItemWrapper className="flex items-center justify-end max-w-lg ml-4 h-11 whitespace-nowrap">
+          <div className="flex justify-center items-center h-full w-52 rounded-3xl">
+            <span className="text-sm font-semibold">당신의 공간을 에어비엔나하세요</span>
+          </div>
+
+          <div className="flex justify-center items-center w-12 h-full rounded-3xl">
+            <Word />
+          </div>
+
+          <div
+            onClick={openUserModal}
+            className="flex items-center justify-evenly h-full rounded-3xl w-20 cursor-pointer"
+          >
+            <FaBars />
+            <label className="text-3xl cursor-pointer">
+              {isLogin ? (
+                <LoginUserIcon className="flex justify-center items-center">
+                  <span className="text-xs text-white">{userName}</span>
+                </LoginUserIcon>
+              ) : (
+                <FaUserCircle />
+              )}
+            </label>
+          </div>
+        </ThirdItemWrapper>
+
+        {isOpenUser && <UserModal setIsOpen={setIsOpenUser} onClose={closeUserModal} />}
+      </NavWrapper>
+      {isLogin && !isAnti && (
+        <>
+          <AntiDiscriminationModal />
+          <BlackBgOverlay onClose={closeAntiModal} />
+        </>
+      )}
+
+      {isLogin && isAnti && !onOpen && (
+        <>
+          <AddProfileModal onClose={setOnOpen} />
+          <BlackBgOverlay onClose={closeAntiModal} />
+        </>
+      )}
+    </>
+  );
+};
+
+export default Nav;
 
 const NavWrapper = styled.div`
   height: var(--nav-h);
@@ -105,7 +222,7 @@ const ThirdItemWrapper = styled.div`
     display: none;
   }
   div:last-child {
-    height: 90%;
+    // height: 90%;
     color: #717171;
     border: 1px solid #dddddd;
     &:hover {
@@ -128,78 +245,10 @@ const ThirdItemWrapper = styled.div`
   }
 `;
 
-const Nav = () => {
-  const [isOpenUser, setIsOpenUser] = useState(false);
+const LoginUserIcon = styled.span`
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
 
-  const openUserModal = () => {
-    setIsOpenUser(true);
-  };
-  const closeUserModal = () => {
-    setIsOpenUser(false);
-  };
-
-  return (
-    <NavWrapper className="w-full box-border flex items-center justify-between">
-      <FirstItemWrapper>
-        <BLogoWrapper className="flex justify-start items-center gap-1 text-2xl font-medium cursor-pointer">
-          <MLogo />
-          <span>airvienna</span>
-        </BLogoWrapper>
-        <MLogoWrapper className="cursor-pointer">
-          <MLogo />
-        </MLogoWrapper>
-      </FirstItemWrapper>
-
-      <SecondItemWrapper className="ml-5">
-        <BigInput className="box-border flex justify-between items-center rounded-full px-5">
-          <div className="text-xl flex items-center w-full cursor-pointer">
-            <HiSearch />
-            <div className="flex flex-col ml-2.5">
-              <span className="text-sm font-semibold">어디든지</span>
-              <span className="text-xs text-gray-400">언제든 일주일 • 게스트 추가</span>
-            </div>
-          </div>
-
-          <SwitchWrapper className="text-xl h-9 w-9 rounded-3xl flex justify-center items-center cursor-pointer">
-            <Switch />
-          </SwitchWrapper>
-        </BigInput>
-
-        <SmallInputWrapper className="w-80 h-14 pt-1.5">
-          <SmallInput className="flex items-center justify-between text-sm px-2 max-w-full rounded-full">
-            <div className="font-semibold ml-4 cursor-pointer">어디든지</div>
-            <span className="h-6 w-px"></span>
-            <div className="font-semibold cursor-pointer">언제든 일주일</div>
-            <span className="h-6 w-px"></span>
-            <div className="text-gray-400 cursor-pointer">게스트 추가</div>
-            <SmallInputSearch className="flex justify-center items-center text-base font-semibold cursor-pointer w-8 h-8 rounded-full">
-              <HiSearch />
-            </SmallInputSearch>
-          </SmallInput>
-        </SmallInputWrapper>
-      </SecondItemWrapper>
-
-      <ThirdItemWrapper className="flex items-center justify-end max-w-lg ml-4 h-11 whitespace-nowrap">
-        <div className="flex justify-center items-center h-full w-52 rounded-3xl">
-          <span className="text-sm font-semibold">당신의 공간을 에어비엔나하세요</span>
-        </div>
-        <div className="flex justify-center items-center w-12 h-full rounded-3xl">
-          <Word />
-        </div>
-        <div
-          onClick={openUserModal}
-          className="flex items-center justify-evenly h-full rounded-3xl w-20 cursor-pointer"
-        >
-          <FaBars />
-          <label className="text-3xl cursor-pointer">
-            <FaUserCircle />
-          </label>
-        </div>
-      </ThirdItemWrapper>
-
-      {isOpenUser && <UserModal setIsOpen={setIsOpenUser} onClose={closeUserModal} />}
-    </NavWrapper>
-  );
-};
-
-export default Nav;
+  background-color: #222222;
+`;

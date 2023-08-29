@@ -2,44 +2,53 @@ import { PropsWithChildren } from 'react';
 import { styled } from 'styled-components';
 import LoadingDots from './LoadingDots';
 
-interface LoginButtonProps {
+interface ButtonProps {
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   value?: string;
   isLoading?: boolean;
   type?: any;
+  isDark?: boolean;
 }
 
-interface LoginButtonWrapperProps {
+interface ButtonWrapperProps {
   $isLoading?: boolean;
+  $isDark?: boolean;
 }
 
-const LoginButton = ({
+const DarkButton = ({
   children,
   onClick,
   value,
   isLoading,
   type,
-}: PropsWithChildren<LoginButtonProps>) => {
+  isDark,
+}: PropsWithChildren<ButtonProps>) => {
   return (
-    <LoginButtonWrapper
+    <ButtonWrapper
+      $isDark={isDark}
       type={type && type}
       $isLoading={isLoading}
       onClick={onClick}
       value={value}
-      className="w-full h-11 rounded-md text-white text-sm flex justify-center items-center"
+      className="w-full h-11 rounded-md text-sm flex justify-center items-center"
     >
       {isLoading ? <LoadingDots /> : children}
-    </LoginButtonWrapper>
+    </ButtonWrapper>
   );
 };
 
-export default LoginButton;
+export default DarkButton;
 
-const LoginButtonWrapper = styled.button<LoginButtonWrapperProps>`
+const ButtonWrapper = styled.button<ButtonWrapperProps>`
   min-height: 2.75rem;
+  border: 1px solid black;
 
-  background-color: ${({ $isLoading }) =>
-    $isLoading ? 'var(--color-gray-400)' : 'var(--main-color)'};
+  background-color: #222222;
+  color: white;
 
   z-index: 1;
+
+  &:hover {
+    background-color: black;
+  }
 `;
