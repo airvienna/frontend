@@ -32,10 +32,11 @@ const UserModal = ({ onClose, setIsOpen }: userModalProps) => {
             <div>당신의 공간을 에어비엔나하세요</div>
             <div>도움말 센터</div>
           </UserModalWrapper>
-          {createPortal(
+          {/* {createPortal(
             <WhiteBgOverlay onClose={onClose} />,
             document.body as HTMLElement
-          )}
+          )} */}
+          <WhiteBgOverlay onClose={onClose} />
         </>
       )}
       {isLoginopen && (
