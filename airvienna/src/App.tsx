@@ -1,22 +1,22 @@
 import { Outlet } from 'react-router-dom';
 import Nav from './Nav/Nav';
-import Footer from './Nav/Footer';
 import { styled } from 'styled-components';
+import BottomNav from './Nav/Footer';
 
-const NavWrapper = styled.nav`
-  border-bottom: 1px solid #dddddd;
+const Main = styled.div`
+  margin-top: calc(var(--nav-h) * 2 + 1rem); // Nav높이 뺸 값
 `;
 
 function App() {
   return (
     <>
-      <NavWrapper>
-        <Nav />
-      </NavWrapper>
+      <Nav />
 
-      <Outlet />
+      <Main className="pb-20">
+        <Outlet />
+      </Main>
 
-      <Footer />
+      <BottomNav />
     </>
   );
 }

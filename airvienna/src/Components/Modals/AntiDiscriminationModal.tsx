@@ -11,7 +11,7 @@ const AntiDiscriminationModal = () => {
 
   return (
     <>
-      <Wrapper className="flex flex-col p-5 rounded-xl justify-between">
+      <Wrapper className="flex flex-col p-5 rounded-xl justify-between fixed inset-0 bg-white m-auto">
         <LogoWrapper>
           <MLogo />
         </LogoWrapper>
@@ -32,9 +32,9 @@ const AntiDiscriminationModal = () => {
           커뮤니티의 모든 사람을 존중하며 편견이나 선입견 없이 대하는 것에 동의합니다.
         </span>
 
-        <MoreButton className="flex justify-evenly items-center">
-          <span>더 알아보기</span>
-          <div>
+        <MoreButton className="flex justify-evenly items-center w-24 h-8 rounded-lg">
+          <span className="underline">더 알아보기</span>
+          <div className="text-xs">
             <BsChevronRight />
           </div>
         </MoreButton>
@@ -52,17 +52,7 @@ const Wrapper = styled.div`
   width: var(--modal-wrapper-width);
   height: 500px;
 
-  position: fixed;
-  z-index: 2;
-
-  background-color: white;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto auto;
-
-  border-radius: ;
+  z-index: 4;
 `;
 
 const LogoWrapper = styled.div`
@@ -70,19 +60,7 @@ const LogoWrapper = styled.div`
 `;
 
 const MoreButton = styled.button`
-  width: 100px;
-  height: 30px;
-
-  border-radius: 6px;
   border: 1px solid black;
-
-  span {
-    text-decoration: underline;
-  }
-
-  div {
-    font-size: 12px;
-  }
 `;
 
 const BigText = styled.span`

@@ -30,8 +30,9 @@ export const WhiteBgOverlay = ({ onClose, zIndex }: OverlayProps) => {
 
 const BlackWrapper = styled.div`
   background-color: rgba(0, 0, 0, 0.3);
+  z-index: 2;
 `;
 
 const WhiteWrapper = styled.div<WrapperProps>`
-  z-index: ${({ $zIndex }) => ($zIndex ? $zIndex : 0)};
+  z-index: ${({ $zIndex }) => ($zIndex ? $zIndex : 2)};
 `;

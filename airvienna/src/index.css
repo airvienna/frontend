@@ -65,3 +65,12 @@ input[type='number']::-webkit-inner-spin-button {
 .c-text-lightblack {
   color: rgb(34, 34, 34);
 }
+
+.scroll-hidden::-webkit-scrollbar {
+  display: none;
+}
+
+.scroll-hidden {
+  -ms-overflow-style: none; /* 인터넷 익스플로러 */
+  scrollbar-width: none; /* 파이어폭스 */
+}

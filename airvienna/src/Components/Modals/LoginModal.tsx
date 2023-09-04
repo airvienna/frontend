@@ -13,33 +13,29 @@ import { useNavigation } from 'react-router-dom';
 import LoginButton from '../general/LoginButton';
 import ModalHeader from './ModalHeader';
 import { emailAtom } from '../../atom/emailAtoms';
-import { useRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
+import {
+  LoginModalProps,
+  LoginModalWrapperProps,
+  InputWrapperProps,
+} from '../../Types/modalType';
+import { MdOutlinePhoneAndroid } from 'react-icons/md';
+import { useValidate } from '../../hooks/useValidate';
 
-interface LoginModalProps {
-  isOpen: boolean;
-  onClose: (value: boolean) => void;
-  setVerifiedEmail: (value: boolean) => void;
-}
-
-interface LoginModalWrapperProps {
-  $isEmail: boolean;
-}
-
-interface InputWrapperProps {
-  $error?: boolean;
-}
-
-const LoginModal = ({ isOpen, onClose, setVerifiedEmail }: LoginModalProps) => {
-  const [nowEmail, setNowEmail] = useRecoilState(emailAtom);
-
+const LoginModal = ({
+  isOpen,
+  onClose,
+  setVerifiedEmail,
+  openEmail,
+}: LoginModalProps) => {
+  const setNowEmail = useSetRecoilState(emailAtom);
+  const navigation = useNavigation();
+  const isLoading = navigation.state === 'submitting';
   const [countryNum, setCountryNum] = useState('+82');
-  const [onInputModal, setOnInputModal] = useState(false);
-  const openInputModal = () => {
-    setOnInputModal(true);
-  };
-  const closeInputModal = () => {
-    setOnInputModal(false);
-  };
+
+  const { errors, validateEmail, validatePhoneNumber } = useValidate();
+  const phoneInputRef = useRef<HTMLInputElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
   const [loginAnimate, setLoginAnimate] = useAnimate();
   useEffect(() => {
@@ -54,58 +50,37 @@ const LoginModal = ({ isOpen, onClose, setVerifiedEmail }: LoginModalProps) => {
     }
   }, [isOpen]);
 
-  const phoneInputRef = useRef<HTMLInputElement>(null);
-  const [phoneNumberErrorMessage, setPhoneNumberErrorMessage] = useState('');
-  const verifyPhoneNumber = () => {
-    if (phoneInputRef?.current?.value === '') {
-      setPhoneNumberErrorMessage('전화번호는 필수 항목입니다.');
-    } else if (
-      phoneInputRef?.current?.value &&
-      phoneInputRef?.current?.value?.length >= 1 &&
-      phoneInputRef?.current?.value?.length < 7
-    ) {
-      setPhoneNumberErrorMessage(
-        '전화번호가 너무 짧거나 유효하지 않은 문자를 포함합니다.'
-      );
-    } else setPhoneNumberErrorMessage('');
-    phoneInputRef?.current?.focus();
+  const [onInputModal, setOnInputModal] = useState(false);
+  const openInputModal = () => {
+    setOnInputModal(true);
+  };
+  const closeInputModal = () => {
+    setOnInputModal(false);
   };
 
-  const emailInputRef = useRef<HTMLInputElement>(null);
-  const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{0,4}$/;
-  const [emailErrorMessage, setEmailErrorMessage] = useState('');
-  const verifyEmail = () => {
-    if (emailInputRef?.current?.value === '')
-      setEmailErrorMessage('이메일이 필요합니다.');
-    else if (!emailPattern.test(emailInputRef?.current?.value + ''))
-      setEmailErrorMessage('이메일을 입력하세요.');
-    else {
-      setEmailErrorMessage('');
-    }
-  };
-
-  const [loginWay, setLoginWay] = useState('phone');
+  const [loginWay, setLoginWay] = useState('전화번호');
   const loginWayHandler = (e: React.MouseEvent<HTMLButtonElement>) => {
     const { value } = e.currentTarget;
     setLoginWay(value);
   };
 
-  const navigation = useNavigation();
-  const isLoading = navigation.state === 'submitting';
-
   const submitHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     const { value } = event.currentTarget;
+
     switch (value) {
-      case 'phone':
-        verifyPhoneNumber();
+      case '전화번호':
+        validatePhoneNumber(phoneInputRef?.current?.value + '');
+        phoneInputRef?.current?.focus();
         break;
 
       case '이메일':
-        verifyEmail();
-        if (emailErrorMessage === '') {
+        if (emailInputRef?.current?.value !== '' && errors.email == '') {
           setNowEmail(emailInputRef?.current?.value + '');
           setVerifiedEmail(true);
+          openEmail();
+        } else {
+          validateEmail(emailInputRef?.current?.value + '');
         }
         break;
     }
@@ -117,7 +92,7 @@ const LoginModal = ({ isOpen, onClose, setVerifiedEmail }: LoginModalProps) => {
         <LoginModalWrapper
           $isEmail={loginWay == '이메일'}
           ref={loginAnimate}
-          className="p-5 rounded-xl bg-white flex flex-col justify-between"
+          className="p-5 rounded-xl bg-white flex flex-col justify-between inset-x-0 fixed"
         >
           <ModalHeader onClick={() => onClose(false)}>로그인 또는 회원가입</ModalHeader>
           <SecondItemWrapper
@@ -129,9 +104,9 @@ const LoginModal = ({ isOpen, onClose, setVerifiedEmail }: LoginModalProps) => {
             </span>
 
             <div className="flex flex-col">
-              {loginWay == 'phone' && (
+              {loginWay == '전화번호' && (
                 <TwoInputWrapper>
-                  <CountrySelectWrapper className="h-2/4 flex flex-col relative">
+                  <CountrySelectWrapper className="h-2/4 flex flex-col relative w-full">
                     <span className="text-xs absolute text-gray-400">국가/지역</span>
                     <select
                       defaultValue={'+82'}
@@ -149,42 +124,45 @@ const LoginModal = ({ isOpen, onClose, setVerifiedEmail }: LoginModalProps) => {
                     </div>
                   </CountrySelectWrapper>
 
-                  <InputWrapper $error={phoneNumberErrorMessage !== ''}>
+                  <InputWrapper $error={errors.phoneNumber !== ''}>
                     <StyledInput
-                      error={phoneNumberErrorMessage !== ''}
+                      error={errors.phoneNumber !== ''}
                       InputRef={phoneInputRef}
                       inputType="number"
                       btext="전화번호"
                       countryNum={countryNum}
                       onModal={onInputModal}
                       openModal={openInputModal}
-                      onKeyDown={() => setPhoneNumberErrorMessage('')}
+                      onKeyDown={() => {
+                        validatePhoneNumber('입력중엔true입니다');
+                      }}
                     />
                   </InputWrapper>
                 </TwoInputWrapper>
               )}
 
               {loginWay == '이메일' && (
-                <InputWrapper $error={emailErrorMessage !== ''}>
+                <InputWrapper $error={errors.email !== ''}>
                   <StyledInput
-                    onKeyDown={verifyEmail}
+                    onChange={(event: any) => validateEmail(event.target.value)}
+                    onKeyDown={(event: any) => validateEmail(event.target.value)}
                     inputType="email"
                     onModal={onInputModal}
                     openModal={openInputModal}
                     InputRef={emailInputRef}
                     btext="이메일"
                     isSamebtext={true}
-                    error={emailErrorMessage !== ''}
+                    error={errors.email !== ''}
                   />
                 </InputWrapper>
               )}
             </div>
 
-            {loginWay == 'phone' && (
+            {loginWay == '전화번호' && (
               <>
-                {phoneNumberErrorMessage ? (
+                {errors.phoneNumber !== '' ? (
                   <ErrorInformWrapper>
-                    <ErrorInform message={phoneNumberErrorMessage} />
+                    <ErrorInform message={errors.phoneNumber} />
                   </ErrorInformWrapper>
                 ) : (
                   <span style={{ marginTop: '-10px' }} className="text-xs text-gray-800">
@@ -197,7 +175,7 @@ const LoginModal = ({ isOpen, onClose, setVerifiedEmail }: LoginModalProps) => {
             )}
 
             {loginWay == '이메일' && (
-              <>{emailErrorMessage && <ErrorInform message={emailErrorMessage} />}</>
+              <>{errors.email !== '' && <ErrorInform message={errors.email} />}</>
             )}
 
             <LoginButton isLoading={isLoading} value={loginWay} onClick={submitHandler}>
@@ -212,9 +190,16 @@ const LoginModal = ({ isOpen, onClose, setVerifiedEmail }: LoginModalProps) => {
           </div>
 
           <div className="flex flex-col items-center justify-evenly py-3.5 max-h-60">
-            <SnsLoginBtn snsName="이메일" onClick={loginWayHandler}>
-              <HiOutlineMail />
-            </SnsLoginBtn>
+            {loginWay == '전화번호' ? (
+              <SnsLoginBtn snsName="이메일" onClick={loginWayHandler}>
+                <HiOutlineMail />
+              </SnsLoginBtn>
+            ) : (
+              <SnsLoginBtn snsName="전화번호" onClick={loginWayHandler}>
+                <MdOutlinePhoneAndroid />
+              </SnsLoginBtn>
+            )}
+
             <SnsLoginBtn snsName="구글" onClick={loginWayHandler}>
               <img src={googleImage} />
             </SnsLoginBtn>
@@ -230,15 +215,13 @@ const LoginModal = ({ isOpen, onClose, setVerifiedEmail }: LoginModalProps) => {
 export default LoginModal;
 
 const LoginModalWrapper = styled.div<LoginModalWrapperProps>`
-  z-index: 2;
   width: var(--modal-wrapper-width);
   height: ${({ $isEmail }) => ($isEmail ? '480px' : '580px')};
+  z-index: 3;
 
-  position: fixed;
   top: var(--nav-h);
-  left: 0;
-  right: 0;
   margin: 0 auto;
+
   transform: translateY(300px);
 `;
 
@@ -247,13 +230,11 @@ const ErrorInformWrapper = styled.div`
 `;
 
 const SecondItemWrapper = styled.form<LoginModalWrapperProps>`
-  padding-top: var(--signup-pdsize);
   height: ${({ $isEmail }) => ($isEmail ? '180px' : '300px')};
 `;
 
 const CountrySelectWrapper = styled.div`
   border-bottom: 1px solid gray;
-  width: 100%;
 
   span {
     left: calc(var(--signup-pdsize) / 2);
@@ -294,6 +275,8 @@ export const InputWrapper = styled.div<InputWrapperProps>`
   height: 52px;
   min-height: 52px;
 
+  z-index: 4;
+
   border-radius: var(--input-radius);
   border: ${({ $error }) => ($error ? '1px solid var(--error-color)' : '1px solid gray')};
 `;
@@ -302,6 +285,7 @@ export const TwoInputWrapper = styled.div`
   width: 100%;
   height: 104px;
 
+  z-index: 4;
   border: 1px solid gray;
   border-radius: var(--input-radius);
 `;
