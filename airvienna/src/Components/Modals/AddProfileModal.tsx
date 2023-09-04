@@ -1,16 +1,12 @@
 import { styled } from 'styled-components';
 import ModalHeader from './ModalHeader';
 import MLogo from '../../Nav/svg/MLogo';
-import Button from '../general/Button';
 import DarkButton from '../general/DarkButton';
-
-interface AddProfileModalProps {
-  onClose: (value: boolean) => void;
-}
+import { AddProfileModalProps } from '../../Types/modalType';
 
 const AddProfileModal = ({ onClose }: AddProfileModalProps) => {
   return (
-    <Wrapper className="flex flex-col p-5 rounded-xl justify-between items-center">
+    <Wrapper className="flex flex-col p-5 rounded-xl justify-between items-center inset-0 bg-white fixed m-auto">
       <ModalHeader onClick={() => onClose(true)}>프로필 생성하기</ModalHeader>
 
       <LogoWrapper>
@@ -36,17 +32,9 @@ const Wrapper = styled.div`
   width: var(--modal-wrapper-width);
   height: 300px;
 
-  position: fixed;
-  z-index: 2;
-
-  background-color: white;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto auto;
+  z-index: 4;
 `;
 
 const BigText = styled.span`
-  margin-bottom: -30px;
+  margin-bottom: -10px;
 `;

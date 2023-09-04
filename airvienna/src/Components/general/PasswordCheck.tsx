@@ -6,25 +6,18 @@ interface ErrorInformProps {
 }
 
 const Wrapper = styled.div`
-  width: 100%;
-  height: 20px;
-
   color: var(--check-color);
-  div {
-    font-size: 12px;
-  }
   span {
     margin-left: 6px;
-    font-size: 12px;
   }
 `;
 const PasswordCheck = ({ message }: ErrorInformProps) => {
   return (
-    <Wrapper className="flex items-center">
-      <div>
+    <Wrapper className="flex items-center w-full h-5">
+      <div className="text-xs">
         <AiFillCheckCircle />
       </div>
-      <span>{message}</span>
+      <span className="text-xs">{message}</span>
     </Wrapper>
   );
 };

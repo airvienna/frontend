@@ -8,11 +8,10 @@ const HomeWrapper = styled.div`
   @media screen and (max-width: 743px) {
     height: calc(100vh - 9rem);
   }
-  width: 100%;
 `;
 
 const Home = () => {
-  return <HomeWrapper>This is Home</HomeWrapper>;
+  return <HomeWrapper className="w-full">This is Home</HomeWrapper>;
 };
 
 export default Home;

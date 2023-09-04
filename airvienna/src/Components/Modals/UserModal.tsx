@@ -4,6 +4,7 @@ import { useState } from 'react';
 import LoginModal from './LoginModal';
 import { BlackBgOverlay, WhiteBgOverlay } from '../Overlays/Overlays';
 import EmailSignupModal from './EmailSignupModal';
+import { userModalProps } from '../../Types/modalType';
 
 const UserModal = ({ onClose, setIsOpen }: userModalProps) => {
   const [isLoginopen, setIsLoginopen] = useState(false);
@@ -16,12 +17,15 @@ const UserModal = ({ onClose, setIsOpen }: userModalProps) => {
     setIsLoginopen(false);
     setIsOpen(false);
   };
+  const openEmailModal = () => {
+    setIsLoginopen(true);
+  };
 
   return (
     <>
       {!isLoginopen && (
         <>
-          <UserModalWrapper className="rounded-xl flex flex-col justify-around items-between box-border p-3 text-sm w-60 h-52 border-2 border-gray-50 bg-white">
+          <UserModalWrapper className="rounded-xl flex flex-col justify-around items-between box-border p-3 text-sm w-60 h-52 border-2 border-gray-50 bg-white absolute top-0 right-0">
             <div onClick={openLoginModal}>로그인</div>
             <div onClick={openLoginModal}>회원 가입</div>
             <hr className="w-60" />
@@ -37,6 +41,7 @@ const UserModal = ({ onClose, setIsOpen }: userModalProps) => {
       {isLoginopen && (
         <>
           <LoginModal
+            openEmail={openEmailModal}
             isOpen={isLoginopen}
             onClose={closeLoginModal}
             setVerifiedEmail={setVerifiedEmail}
@@ -45,25 +50,22 @@ const UserModal = ({ onClose, setIsOpen }: userModalProps) => {
         </>
       )}
 
-      {verifiedEmail && <EmailSignupModal onClose={closeLoginModal} />}
+      {verifiedEmail && (
+        <>
+          <EmailSignupModal onClose={closeLoginModal} />
+          <BlackBgOverlay onClose={closeLoginModal} />
+        </>
+      )}
     </>
   );
 };
 
 export default UserModal;
 
-interface userModalProps {
-  onClose: () => void;
-  setIsOpen: (value: boolean) => void;
-}
-
 const UserModalWrapper = styled.div`
   box-shadow: 1px 1px 15px rgba(0, 0, 0, 0.01), -1px -1px 15px rgba(0, 0, 0, 0.1);
-  z-index: 2;
+  z-index: 3;
 
-  position: absolute;
-  right: 0;
-  top: 0;
   margin-top: calc(var(--nav-h) - 10px);
   margin-right: var(--p-big);
   @media screen and (max-width: 1440px) {

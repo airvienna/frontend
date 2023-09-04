@@ -11,6 +11,7 @@ import { isAntiAtom, isLoginAtom, userNameAtom } from '../atom/isloginAtom';
 import AntiDiscriminationModal from '../Components/Modals/AntiDiscriminationModal';
 import { BlackBgOverlay } from '../Components/Overlays/Overlays';
 import AddProfileModal from '../Components/Modals/AddProfileModal';
+import Slider from './Slider';
 
 const Nav = () => {
   const [isOpenUser, setIsOpenUser] = useState(false);
@@ -36,8 +37,8 @@ const Nav = () => {
   const [onOpen, setOnOpen] = useState(false);
 
   return (
-    <>
-      <NavWrapper className="w-full box-border flex items-center justify-between">
+    <Wrapper className="fixed">
+      <NavWrapper className="w-full box-border flex items-center justify-between bg-white">
         <FirstItemWrapper>
           <BLogoWrapper className="flex justify-start items-center gap-1 text-2xl font-medium cursor-pointer">
             <MLogo />
@@ -70,14 +71,14 @@ const Nav = () => {
               <div className="font-semibold cursor-pointer">언제든 일주일</div>
               <span className="h-6 w-px"></span>
               <div className="text-gray-400 cursor-pointer">게스트 추가</div>
-              <SmallInputSearch className="flex justify-center items-center text-base font-semibold cursor-pointer w-8 h-8 rounded-full">
+              <SmallInputSearch className="flex justify-center items-center text-base font-semibold cursor-pointer w-8 h-8 rounded-full text-white">
                 <HiSearch />
               </SmallInputSearch>
             </SmallInput>
           </SmallInputWrapper>
         </SecondItemWrapper>
 
-        <ThirdItemWrapper className="flex items-center justify-end max-w-lg ml-4 h-11 whitespace-nowrap">
+        <ThirdItemWrapper className="flex items-center justify-end max-w-lg ml-4 h-11 whitespace-nowrap relative">
           <div className="flex justify-center items-center h-full w-52 rounded-3xl">
             <span className="text-sm font-semibold">당신의 공간을 에어비엔나하세요</span>
           </div>
@@ -93,7 +94,7 @@ const Nav = () => {
             <FaBars />
             <label className="text-3xl cursor-pointer">
               {isLogin ? (
-                <LoginUserIcon className="flex justify-center items-center">
+                <LoginUserIcon className="flex justify-center items-center w-8 h-8 rounded-2xl">
                   <span className="text-xs text-white">{userName}</span>
                 </LoginUserIcon>
               ) : (
@@ -105,6 +106,7 @@ const Nav = () => {
 
         {isOpenUser && <UserModal setIsOpen={setIsOpenUser} onClose={closeUserModal} />}
       </NavWrapper>
+
       {isLogin && !isAnti && (
         <>
           <AntiDiscriminationModal />
@@ -118,11 +120,17 @@ const Nav = () => {
           <BlackBgOverlay onClose={closeAntiModal} />
         </>
       )}
-    </>
+
+      <Slider />
+    </Wrapper>
   );
 };
 
 export default Nav;
+
+const Wrapper = styled.div`
+  inset: 0;
+`;
 
 const NavWrapper = styled.div`
   height: var(--nav-h);
@@ -135,6 +143,8 @@ const NavWrapper = styled.div`
   @media screen and (max-width: 743px) {
     padding: var(--p-small);
   }
+
+  border-bottom: 1px solid #dddddd;
 `;
 
 const FirstItemWrapper = styled.div`
@@ -175,7 +185,8 @@ const BigInput = styled.div`
   margin-left: -20px;
   border: 0.5px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  width: calc(100%-48px);
+  width: calc(100% - 48px);
+
   min-height: 56px;
   min-width: 285px;
   @media screen and (min-width: 743px) {
@@ -209,11 +220,9 @@ const SmallInput = styled.div`
 
 const SmallInputSearch = styled.div`
   background-color: #ff385c;
-  color: white;
 `;
 
 const ThirdItemWrapper = styled.div`
-  position: relative;
   flex: 1 0 auto;
   @media screen and (min-width: 950px) {
     flex: 1 0 140px;
@@ -222,7 +231,6 @@ const ThirdItemWrapper = styled.div`
     display: none;
   }
   div:last-child {
-    // height: 90%;
     color: #717171;
     border: 1px solid #dddddd;
     &:hover {
@@ -246,9 +254,5 @@ const ThirdItemWrapper = styled.div`
 `;
 
 const LoginUserIcon = styled.span`
-  width: 30px;
-  height: 30px;
-  border-radius: 15px;
-
   background-color: #222222;
 `;

@@ -1,5 +1,5 @@
 import { useAnimate } from 'framer-motion';
-import { Children, PropsWithChildren, useEffect, useState } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import { styled } from 'styled-components';
 
 interface StyledInputProps {
@@ -15,12 +15,13 @@ interface StyledInputProps {
   isSamebtext?: boolean;
   btext?: string;
   countryNum?: string;
+  tabIndex?: number;
 
-  onChange?: () => void;
+  onChange?: any;
   openModal?: () => void;
   onFocus?: () => void;
   onBlur?: any;
-  onKeyDown?: () => void;
+  onKeyDown?: any;
   onInput?: () => void;
 }
 
@@ -47,6 +48,7 @@ const StyledInput = ({
   defaultValue,
   max,
   min,
+  tabIndex,
 }: PropsWithChildren<StyledInputProps>) => {
   const [bigText, setBigText] = useAnimate();
   const [smallText, setSmallText] = useAnimate();
@@ -76,11 +78,12 @@ const StyledInput = ({
   return (
     <>
       <Wrapper
+        tabIndex={tabIndex ? tabIndex : 0}
         $error={error}
         $onBlur={onBlur}
         $isSamebtext={isSamebtext}
         onClick={openModal}
-        className="flex flex-col justify-center"
+        className="flex flex-col justify-center w-full h-full"
       >
         <BigTextWrapper
           $error={error}
@@ -93,7 +96,7 @@ const StyledInput = ({
         <SmallTextWrapper
           $notInput={notInput}
           ref={smallText}
-          className="flex justify-start items-center font-normal text-md h-full"
+          className="flex justify-start items-center font-normal text-md h-full w-full hidden"
         >
           {!isSamebtext && countryNum && <div>{countryNum}</div>}
           <Input
@@ -109,7 +112,9 @@ const StyledInput = ({
             ref={InputRef}
             defaultValue={defaultValue ? defaultValue : ''}
           />
-          <ChildrenWrapper>{children}</ChildrenWrapper>
+          <ChildrenWrapper className="absolute text-xs underline">
+            {children}
+          </ChildrenWrapper>
         </SmallTextWrapper>
       </Wrapper>
     </>
@@ -119,19 +124,15 @@ const StyledInput = ({
 export default StyledInput;
 
 const ChildrenWrapper = styled.span`
-  position: absolute;
   right: 30px;
-  z-index: 3;
-  font-size: 12px;
-  text-decoration: underline;
+  z-index: 4;
+
   margin-bottom: 20px;
 `;
 
 const Wrapper = styled.div<isSamebtextStyledProps>`
-  width: 100%;
-  height: 100%;
-
   background-color: ${({ $onBlur }) => ($onBlur ? '#fff8f6' : 'white')};
+
   border-radius: inherit;
   border: 1px solid ${({ $error }) => ($error ? '#fff8f6' : 'inherit')};
 
@@ -146,7 +147,7 @@ const Wrapper = styled.div<isSamebtextStyledProps>`
 const Input = styled.input<isSamebtextStyledProps>`
   width: 98%;
   height: 85%;
-  z-index: 1;
+  z-index: 4;
 
   border-bottom-right-radius: var(--input-radius);
   background-color: ${({ $onBlur }) => ($onBlur ? `#fff8f6` : 'white')};
@@ -165,8 +166,6 @@ const BigTextWrapper = styled.div<isSamebtextStyledProps>`
 `;
 
 const SmallTextWrapper = styled.div<isSamebtextStyledProps>`
-  width: 100%;
-  display: none;
   padding-left: calc(var(--signup-pdsize) / 2);
 
   color: ${({ $notInput }) => ($notInput ? 'var(--input-text-color)' : 'black')};

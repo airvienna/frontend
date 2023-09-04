@@ -11,25 +11,18 @@ interface WrapperProps {
 }
 
 const Wrapper = styled.div<WrapperProps>`
-  width: 100%;
-  height: 20px;
-
   color: ${({ $grayColor }) => ($grayColor ? '#222222' : 'var(--error-color)')};
-  div {
-    font-size: 12px;
-  }
   span {
     margin-left: 6px;
-    font-size: 12px;
   }
 `;
 const PasswordInform = ({ message, grayColor }: ErrorInformProps) => {
   return (
-    <Wrapper $grayColor={grayColor} className="flex items-center">
-      <div>
+    <Wrapper $grayColor={grayColor} className="flex items-center w-full h-5">
+      <div className="text-xs">
         <AiFillCloseCircle />
       </div>
-      <span>{message}</span>
+      <span className="text-xs">{message}</span>
     </Wrapper>
   );
 };

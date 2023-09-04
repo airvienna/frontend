@@ -4,7 +4,7 @@ import { InputWrapper, TwoInputWrapper } from './LoginModal';
 import StyledInput from '../Input/StyledInput';
 import { useEffect, useRef, useState } from 'react';
 import { WhiteBgOverlay } from '../Overlays/Overlays';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { emailAtom } from '../../atom/emailAtoms';
 import PasswordCheck from '../general/PasswordCheck';
 import PasswordInform from '../general/PasswordInform';
@@ -13,51 +13,39 @@ import ErrorInform from '../general/ErrorInform';
 import {
   ActionFunctionArgs,
   useActionData,
-  useNavigate,
   useNavigation,
   useSubmit,
 } from 'react-router-dom';
 import axios from 'axios';
 import { isLoginAtom, userNameAtom } from '../../atom/isloginAtom';
+import { useValidate } from '../../hooks/useValidate';
+import { usePasswordValidate } from '../../hooks/usePasswordValidate';
+import { ActionDataType, EmailSignUpModalProps } from '../../Types/modalType';
 
-// 시간 나면 검증부분 전부 커스텀 훅으로 리팩토링 하기.
-
-const DefaultURL = `https://port-0-airvienna-fq2r52kllo5ynh9.sel3.cloudtype.app`;
-
+const { VITE_AIRVIENNA_SERVER } = import.meta.env;
 const maxYear = '9999-12-31';
-const minYear = '1902-12-31';
-const namePattern = /^[a-zA-Z가-힣]{0,8}$/;
-const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{0,4}$/;
-const passwordPattern = /[0-9!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/;
-
-interface EmailSignUpModalProps {
-  onClose: () => void;
-}
-
-interface ActionDataType {
-  verified: boolean;
-  response: any;
-}
 
 const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
-  const navigation = useNavigation();
-  const isSubmitting = navigation.state == 'submitting';
-
-  const navigate = useNavigate();
-  const actionData = useActionData() as ActionDataType;
-  const submit = useSubmit();
-
-  const [nowEmail, setNowEmail] = useRecoilState(emailAtom);
-  const [islogin, setIslogin] = useRecoilState(isLoginAtom);
+  const nowEmail = useRecoilValue(emailAtom);
+  const setIslogin = useSetRecoilState(isLoginAtom);
   const setUsername = useSetRecoilState(userNameAtom);
+  const navigation = useNavigation();
+  const submit = useSubmit();
+  const isSubmitting = navigation.state == 'submitting';
+  const actionData = useActionData() as ActionDataType;
 
   const firstNameRef = useRef<HTMLInputElement>(null);
   const lastNameRef = useRef<HTMLInputElement>(null);
   const birthRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  const passwordLength = passwordRef?.current?.value?.length;
 
-  let passwordLength = passwordRef?.current?.value?.length;
+  const { errors, validateFirstName, validateLastName, validateBirth, validateEmail } =
+    useValidate();
+
+  const { pwCheckError, pwLengthError, pwPatternError, verifyPassword } =
+    usePasswordValidate(firstNameRef?.current?.value + '', emailRef?.current?.value + '');
 
   useEffect(() => {
     if (actionData?.verified) {
@@ -69,82 +57,15 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
     }
   });
 
-  const [firstNameError, setFirstNameError] = useState('');
-  const verifyFirstName = () => {
-    if (!firstNameRef?.current?.value) setFirstNameError('이름을 입력하세요.');
-    else if (!namePattern.test(firstNameRef?.current?.value))
-      setFirstNameError(
-        '이름에 지원되지 않는 문자가 포함되어 있습니다. 다르게 입력해보세요.'
-      );
-    else setFirstNameError('');
-  };
-
-  const [lastNameError, setLastNameError] = useState('');
-  const verifyLastName = () => {
-    if (!lastNameRef?.current?.value) setLastNameError('성을 입력하세요.');
-    else if (!namePattern.test(lastNameRef?.current?.value))
-      setLastNameError(
-        '성에 지원되지 않는 문자가 포함되어 있습니다. 다르게 입력해보세요.'
-      );
-    else setLastNameError('');
-  };
-
-  const [birthError, setBirthError] = useState('');
-  const verifyBirth = () => {
-    if (!birthRef?.current?.value) setBirthError('계속하시려면 생일을 선택하세요.');
-    else if (birthRef?.current?.value < minYear || birthRef?.current?.value > maxYear)
-      setBirthError('생일이 잘못 입력되었습니다.');
-    else setBirthError('');
-  };
-
-  const [emailError, setEmailError] = useState('');
-  const verifyEmail = () => {
-    if (!emailRef?.current?.value) setEmailError('이메일이 필요합니다.');
-    else if (!emailPattern.test(emailRef?.current?.value))
-      setEmailError('이메일을 입력하세요.');
-    else setEmailError('');
-  };
-
-  const [pwCheckError, setPwCheckError] = useState(true);
-  const verifyPwCheck = () => {
-    if (passwordRef?.current?.value == '') setPwCheckError(true);
-    else if (
-      firstNameRef?.current?.value !== '' &&
-      passwordRef?.current?.value.includes(firstNameRef?.current?.value + '')
-    )
-      setPwCheckError(true);
-    else if (
-      passwordRef?.current?.value.includes(emailRef?.current?.value.match(/^[^@]+/) + '')
-    )
-      setPwCheckError(true);
-    else setPwCheckError(false);
-  };
-
-  const [pwLengthError, setPwLengthError] = useState(true);
-  const verifyPwLength = () => {
-    if (passwordRef?.current?.value == '') setPwLengthError(true);
-    else if (passwordRef?.current?.value !== '' && passwordLength && passwordLength < 8)
-      setPwLengthError(true);
-    else setPwLengthError(false);
-  };
-
-  const [pwPatternError, setPwPatternError] = useState(true);
-  const verifyPwPattern = () => {
-    if (!passwordPattern.test(passwordRef?.current?.value + '')) setPwPatternError(true);
-    else setPwPatternError(false);
-  };
-
-  const verifyPassword = () => {
-    passwordLength = passwordRef?.current?.value?.length;
-    verifyPwCheck();
-    verifyPwLength();
-    verifyPwPattern();
-  };
-
   const [privacyError, setPrivacyError] = useState('');
+  const [privacy, setPrivacy] = useState(false);
+  const handlePrivacy = () => {
+    setPrivacy((prev) => !prev);
+  };
+
   const verifyPrivacy = () => {
-    if (!privacy) setPrivacyError('계속하려면 동의해주세요.');
-    else setPrivacyError('');
+    if (privacy) setPrivacyError('');
+    else setPrivacyError('계속하려면 동의해주세요.');
   };
 
   const [onFirstName, setOnFirstName] = useState(false);
@@ -192,8 +113,10 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
     setShowPw((prev) => !prev);
   };
 
-  const [privacy, setPrivacy] = useState(false);
   const [marketing, setMarketing] = useState(false);
+  const handleMarketing = () => {
+    setMarketing((prev) => !prev);
+  };
 
   const [pwLevelError, setPwLevelError] = useState(true);
   useEffect(() => {
@@ -203,19 +126,18 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
 
   const onSubmit = (event: any) => {
     event.preventDefault();
-
-    verifyFirstName();
-    verifyLastName();
-    verifyBirth();
-    verifyEmail();
-    verifyPassword();
+    validateFirstName(firstNameRef?.current?.value + '');
+    validateLastName(lastNameRef?.current?.value + '');
+    validateBirth(birthRef?.current?.value + '');
+    validateEmail(emailRef?.current?.value + '');
+    verifyPassword(passwordRef?.current?.value + '');
     verifyPrivacy();
 
     if (
-      firstNameError === '' &&
-      lastNameError === '' &&
-      birthError === '' &&
-      emailError === '' &&
+      !errors.firstName &&
+      !errors.lastName &&
+      !errors.birth &&
+      !errors.email &&
       privacyError === '' &&
       !pwCheckError &&
       !pwLengthError &&
@@ -235,22 +157,32 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
     }
   };
 
+  const modalStates = [
+    { key: '0', state: onFirstName, close: closeFirstName },
+    { key: '1', state: onLastName, close: closeLastName },
+    { key: '2', state: onBirth, close: closeBirth },
+    { key: '3', state: onEmail, close: closeEmail },
+    { key: '4', state: onPassword, close: closePassword },
+  ];
+
   return (
     <>
       <EmailSignupModalWrapper
         onSubmit={onSubmit}
-        className="p-5 rounded-xl flex flex-col overflow-scroll"
+        className="p-5 rounded-xl flex flex-col overflow-scroll scroll-hidden box-border bg-white fixed inset-x-0 "
       >
         <ModalHeader onClick={onClose}>회원 가입 완료하기</ModalHeader>
 
-        <Margin20>
+        <div className="my-5">
           <TwoInputWrapper>
-            <InputWrapper>
+            <InputWrapper tabIndex={0}>
               <StyledInput
                 onModal={onFirstName}
                 openModal={openFirstName}
-                onChange={verifyFirstName}
-                error={firstNameError !== ''}
+                onChange={(event: any) =>
+                  validateFirstName(event.target.value ? event.target.value : '')
+                }
+                error={errors.firstName !== ''}
                 isSamebtext={true}
                 inputType="text"
                 InputRef={firstNameRef}
@@ -258,12 +190,14 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
               />
             </InputWrapper>
 
-            <InputWrapper>
+            <InputWrapper tabIndex={1}>
               <StyledInput
                 onModal={onLastName}
                 openModal={openLastName}
-                onChange={verifyLastName}
-                error={lastNameError !== ''}
+                onChange={(event: any) =>
+                  validateLastName(event.target.value ? event.target.value : '')
+                }
+                error={errors.lastName !== ''}
                 isSamebtext={true}
                 inputType="text"
                 InputRef={lastNameRef}
@@ -271,65 +205,70 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
               />
             </InputWrapper>
           </TwoInputWrapper>
-          {lastNameError == '' && firstNameError == '' && (
+          {!errors.lastName && !errors.firstName && (
             <span className="c-text-gray text-xs">
               정부 발급 신분증에 표시된 이름과 일치하는지 확인하세요.
             </span>
           )}
-          {firstNameError == '' && lastNameError !== '' && (
-            <ErrorInform message={lastNameError} />
+          {!errors.firstName && errors.lastName !== '' && (
+            <ErrorInform message={errors.lastName} />
           )}
-          {firstNameError !== '' && <ErrorInform message={firstNameError} />}
-        </Margin20>
+          {errors.firstName !== '' && <ErrorInform message={errors.firstName} />}
+        </div>
 
-        <Margin10>
+        <div className="my2.5">
           <InputWrapper>
             <StyledInput
               onModal={onBirth}
               openModal={openBirth}
-              error={birthError !== ''}
+              error={errors.birth !== ''}
               isSamebtext={false}
               inputType="date"
               InputRef={birthRef}
-              onChange={verifyBirth}
+              onChange={(event: any) =>
+                validateBirth(event.target.value ? event.target.value : '')
+              }
               btext="생년월일"
               max={maxYear}
             />
           </InputWrapper>
-          {!birthError ? (
+          {!errors.birth ? (
             <span className="c-text-gray text-xs">
               18세 이상의 성인만 회원으로 가입할 수 있습니다. 생일은 에어비앤비의 다른
               회원에게 공개되지 않습니다.
             </span>
           ) : (
-            <ErrorInform message={birthError} />
+            <ErrorInform message={errors.birth} />
           )}
-        </Margin10>
+        </div>
 
-        <Margin10>
+        <div className="my-2.5">
           <InputWrapper>
             <StyledInput
               InputRef={emailRef}
               onModal={onEmail}
               openModal={openEmail}
-              error={emailError !== ''}
+              error={errors.email !== ''}
               isSamebtext={true}
               inputType="text"
               btext="이메일"
               defaultValue={nowEmail}
-              onKeyDown={verifyEmail}
+              onKeyDown={(event: any) => {
+                const emailValue = event.target.value;
+                validateEmail(emailValue);
+              }}
             />
           </InputWrapper>
-          {!emailError ? (
+          {!errors.email ? (
             <span className="c-text-gray text-xs">
               예약 확인과 영수증을 이메일로 보내드립니다.
             </span>
           ) : (
-            <ErrorInform message={emailError} />
+            <ErrorInform message={errors.email} />
           )}
-        </Margin10>
+        </div>
 
-        <Margin20>
+        <div className="my-5">
           <InputWrapper>
             <StyledInput
               onModal={onPassword}
@@ -339,7 +278,9 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
               inputType={showPw ? 'text' : 'password'}
               btext="비밀번호"
               InputRef={passwordRef}
-              onChange={verifyPassword}
+              onChange={(event: any) =>
+                verifyPassword(event?.target.value ? event?.target.value : '')
+              }
             >
               <span onClick={handleShowPw} className="cursor-pointer">
                 {showPw ? '숨기기' : '표시'}
@@ -382,16 +323,13 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
               )}
             </>
           )}
-        </Margin20>
+        </div>
 
         <hr />
 
-        <Margin20>
+        <div className="my-5">
           <div className="flex justify-between">
-            <div
-              className="flex flex-col w-10/12 cursor-pointer"
-              onClick={() => setPrivacy((prev) => !prev)}
-            >
+            <div className="flex flex-col w-10/12 cursor-pointer" onClick={handlePrivacy}>
               <span className="c-text-lightblack text-xs">
                 개인정보 수집 및 이용에 동의합니다.
               </span>
@@ -403,23 +341,22 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
               </span>
             </div>
 
-            <CheckBox
+            <input
+              className="w-6 h-6"
               type="checkbox"
               checked={privacy}
-              onClick={() => setPrivacy((prev) => !prev)}
+              onChange={handlePrivacy}
             />
           </div>
 
-          <More className="flex justify-center items-center underline cursor-pointer text-xs">
-            더보기
-          </More>
+          <More>더보기</More>
 
           {privacyError !== '' && <ErrorInform message={privacyError} />}
 
           <div className="flex justify-between">
             <div
               className="flex flex-col w-10/12 cursor-pointer"
-              onClick={() => setMarketing((prev) => !prev)}
+              onClick={handleMarketing}
             >
               <span className="c-text-lightblack text-xs">
                 마케팅 이메일 수신을 원합니다(선택).
@@ -431,42 +368,42 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
               </span>
             </div>
 
-            <CheckBox
+            <input
+              className="w-6 h-6"
               type="checkbox"
               checked={marketing}
-              onClick={() => setMarketing((prev) => !prev)}
+              onClick={handleMarketing}
             />
           </div>
 
-          <More className="flex justify-center items-center underline cursor-pointer text-xs">
-            더보기
-          </More>
-        </Margin20>
+          <More>더보기</More>
+        </div>
 
         <hr />
 
-        <Margin20>
+        <div className="my-5">
           <span className="text-sm">
             동의 및 계속하기를 선택하여 에어비엔나&nbsp;
-            <PolicyText>
+            <PolicyText className="cursor-pointer underline">
               서비스 약관, 결제 서비스 약관, 위치기반서비스 이용약관,차별 금지
               정책,개인정보 처리방침
             </PolicyText>
             에 동의합니다.
           </span>
-        </Margin20>
+        </div>
 
-        <Margin30>
+        <div className="my-8">
           <LoginButton isLoading={isSubmitting} type={'submit'}>
             동의 및 계속하기
           </LoginButton>
-        </Margin30>
+        </div>
 
-        {onFirstName && <WhiteBgOverlay onClose={closeFirstName} />}
-        {onLastName && <WhiteBgOverlay onClose={closeLastName} />}
-        {onBirth && <WhiteBgOverlay onClose={closeBirth} />}
-        {onEmail && <WhiteBgOverlay onClose={closeEmail} />}
-        {onPassword && <WhiteBgOverlay onClose={closePassword} />}
+        {modalStates.map(
+          (modalstate) =>
+            modalstate.state && (
+              <WhiteBgOverlay key={modalstate.key} onClose={modalstate.close} />
+            )
+        )}
       </EmailSignupModalWrapper>
     </>
   );
@@ -475,18 +412,11 @@ const EmailSignupModal = ({ onClose }: EmailSignUpModalProps) => {
 export default EmailSignupModal;
 
 const EmailSignupModalWrapper = styled.form`
-  box-sizing: border-box;
   height: 880px;
   width: var(--modal-wrapper-width);
 
-  background-color: white;
-  position: fixed;
-  z-index: 2;
-
+  z-index: 3;
   top: calc(var(--nav-h) / 2);
-
-  left: 0;
-  right: 0;
   margin: 0 auto;
 
   @media screen and (max-height: 850px) {
@@ -498,13 +428,21 @@ const EmailSignupModalWrapper = styled.form`
 const More = styled.div`
   width: 60px;
   height: 40px;
+  border-radius: 5px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  text-decoration: underline;
+  cursor: pointer;
+
+  font-size: 12px;
   font-weight: 500;
 
   box-sizing: border-box;
   padding: 10px;
-
   margin-left: -10px;
-  border-radius: 5px;
 
   &:hover {
     background-color: var(--color-gray-50);
@@ -513,27 +451,6 @@ const More = styled.div`
 
 const PolicyText = styled.span`
   color: var(--deepblue-color);
-  text-decoration: underline;
-
-  cursor: pointer;
-`;
-
-const Margin30 = styled.div`
-  margin: 30px 0px;
-`;
-
-const Margin20 = styled.div`
-  margin: 20px 0px;
-`;
-
-const Margin10 = styled.div`
-  margin: 10px 0px;
-`;
-
-const CheckBox = styled.input`
-  width: 23px;
-  height: 23px;
-  background-color: black;
 `;
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -548,7 +465,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   try {
     const response = await axios({
       method: 'POST',
-      url: `${DefaultURL}/api/auth/signup`,
+      url: `${VITE_AIRVIENNA_SERVER}/api/auth/signup`,
       data: { lastName, firstName, birth, email, password },
     });
 

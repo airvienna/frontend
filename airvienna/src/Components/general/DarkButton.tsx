@@ -30,7 +30,7 @@ const DarkButton = ({
       $isLoading={isLoading}
       onClick={onClick}
       value={value}
-      className="w-full h-11 rounded-md text-sm flex justify-center items-center"
+      className="w-full h-11 rounded-md text-sm flex justify-center items-center text-white"
     >
       {isLoading ? <LoadingDots /> : children}
     </ButtonWrapper>
@@ -44,7 +44,6 @@ const ButtonWrapper = styled.button<ButtonWrapperProps>`
   border: 1px solid black;
 
   background-color: #222222;
-  color: white;
 
   z-index: 1;
 

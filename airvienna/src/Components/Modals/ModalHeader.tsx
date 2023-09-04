@@ -1,18 +1,15 @@
 import { styled } from 'styled-components';
 import { MdOutlineClose } from 'react-icons/md';
 import { PropsWithChildren } from 'react';
-
-interface ModalHeaderProps {
-  onClick: () => void;
-}
+import { ModalHeaderProps } from '../../Types/modalType';
 
 const ModalHeader = ({ onClick, children }: PropsWithChildren<ModalHeaderProps>) => {
   return (
     <ModalHeaderWrapper>
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center h-8">
         <CloseMark
           onClick={onClick}
-          className="flex justify-center items-center rounded-full w-7 h-7"
+          className="flex justify-center items-center rounded-full w-7 h-7 absolute"
         >
           <MdOutlineClose />
         </CloseMark>
@@ -26,11 +23,10 @@ const ModalHeader = ({ onClick, children }: PropsWithChildren<ModalHeaderProps>)
 export default ModalHeader;
 
 const ModalHeaderWrapper = styled.div`
-  height: 30px;
+  margin-bottom: 30px;
 `;
 
 const CloseMark = styled.div`
-  position: absolute;
   left: var(--signup-pdsize);
   &:hover {
     background-color: rgb(249 250 251);
