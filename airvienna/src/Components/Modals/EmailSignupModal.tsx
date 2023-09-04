@@ -419,7 +419,7 @@ const EmailSignupModalWrapper = styled.form`
   top: calc(var(--nav-h) / 2);
   margin: 0 auto;
 
-  @media screen and (max-height: 850px) {
+  @media screen and (max-height: 92s0px) {
     height: 580px;
     top: var(--nav-h);
   }
