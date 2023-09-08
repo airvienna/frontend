@@ -48,7 +48,7 @@ const FooterText = styled.span`
 
 const BottomNav = () => {
   return (
-    <FooterWrapper style={borderTopStyle} className="h-20 relative w-full bottom-0">
+    <FooterWrapper style={borderTopStyle} className="h-20 fixed w-full bottom-0 bg-white">
       <BigWrapper className="h-20">
         <div className="h-1/2 w-full flex justify-between items-center whitespace-nowrap">
           <div className="flex items-center gap-3 text-sm font-normal text-slate-700">
