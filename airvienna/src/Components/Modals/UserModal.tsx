@@ -1,5 +1,4 @@
 import { styled } from 'styled-components';
-import { createPortal } from 'react-dom';
 import { useState } from 'react';
 import LoginModal from './LoginModal';
 import { BlackBgOverlay, WhiteBgOverlay } from '../Overlays/Overlays';
@@ -32,10 +31,7 @@ const UserModal = ({ onClose, setIsOpen }: userModalProps) => {
             <div>당신의 공간을 에어비엔나하세요</div>
             <div>도움말 센터</div>
           </UserModalWrapper>
-          {/* {createPortal(
-            <WhiteBgOverlay onClose={onClose} />,
-            document.body as HTMLElement
-          )} */}
+
           <WhiteBgOverlay onClose={onClose} />
         </>
       )}

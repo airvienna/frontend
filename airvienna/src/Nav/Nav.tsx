@@ -130,6 +130,9 @@ export default Nav;
 
 const Wrapper = styled.div`
   inset: 0;
+  background-color: green;
+
+  height: calc(var(--nav-h) * 2 + 1rem);
 `;
 
 const NavWrapper = styled.div`
@@ -182,7 +185,7 @@ const SecondItemWrapper = styled.div`
 `;
 
 const BigInput = styled.div`
-  margin-left: -20px;
+  // margin-left: -20px;
   border: 0.5px solid rgba(0, 0, 0, 0.08);
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   width: calc(100% - 48px);
